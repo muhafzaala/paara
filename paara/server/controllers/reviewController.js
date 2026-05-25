@@ -1,10 +1,11 @@
 const Review = require("../models/Review");
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 
 const updateProductRating = async (productId) => {
   const stats = await Review.aggregate([
-    { $match: { product: productId, isApproved: true } },
+    { $match: { product: new mongoose.Types.ObjectId(productId), isApproved: true } },
     { $group: { _id: null, avgRating: { $avg: "$rating" }, count: { $sum: 1 } } },
   ]);
   if (stats.length) {
