@@ -24,7 +24,7 @@ exports.setup2FA = async (req, res) => {
 // POST /api/v1/auth/2fa/verify  — Verify token & enable 2FA
 exports.verify2FA = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+twoFactorSecret");
     if (!user.twoFactorSecret)
       return res.status(400).json({ success: false, message: "2FA not set up. Call /setup first." });
 
@@ -48,7 +48,7 @@ exports.verify2FA = async (req, res) => {
 // POST /api/v1/auth/2fa/disable  — Disable 2FA (requires password)
 exports.disable2FA = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("+password");
+    const user = await User.findById(req.user._id).select("+password +twoFactorSecret");
     if (!user.twoFactorEnabled)
       return res.status(400).json({ success: false, message: "2FA is not enabled" });
 
@@ -67,7 +67,7 @@ exports.disable2FA = async (req, res) => {
 // POST /api/v1/auth/2fa/validate  — Validate during login (if 2FA is on)
 exports.validate2FA = async (req, res) => {
   try {
-    const user = await User.findById(req.body.userId);
+    const user = await User.findById(req.body.userId).select("+twoFactorSecret");
     if (!user || !user.twoFactorEnabled)
       return res.status(400).json({ success: false, message: "2FA not enabled for this user" });
 
