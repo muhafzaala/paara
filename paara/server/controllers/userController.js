@@ -98,16 +98,32 @@ exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword)
       return res.status(400).json({ success: false, message: "Both currentPassword and newPassword are required" });
-    if (newPassword.length < 6)
-      return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
+    if (newPassword.length < 8)
+      return res.status(400).json({ success: false, message: "New password must be at least 8 characters" });
+    if (currentPassword === newPassword)
+      return res.status(400).json({ success: false, message: "New password must differ from current password" });
 
     const user = await User.findById(req.user._id).select("+password");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
     const isMatch = await user.matchPassword(currentPassword);
     if (!isMatch) return res.status(401).json({ success: false, message: "Current password is incorrect" });
 
     user.password = newPassword;
     await user.save();
-    res.json({ success: true, message: "Password updated successfully" });
+
+    // Issue a fresh JWT so the new password takes effect immediately;
+    // old tokens remain valid until natural expiry (stateless JWT limitation).
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRE || "7d",
+    });
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+      token,
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
