@@ -117,11 +117,16 @@ exports.changePassword = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
   try {
     const { password } = req.body;
-    const user = await User.findById(req.user._id).select("+password");
-    if (password) {
-      const ok = await user.matchPassword(password);
-      if (!ok) return res.status(401).json({ success: false, message: "Incorrect password" });
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required to delete your account.",
+      });
     }
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    const ok = await user.matchPassword(password);
+    if (!ok) return res.status(401).json({ success: false, message: "Incorrect password" });
     user.isActive = false;
     user.email = `deleted_${Date.now()}_${user.email}`;
     await user.save();
