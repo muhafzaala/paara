@@ -1,0 +1,13 @@
+const express = require("express");
+const router = express.Router();
+const { getWishlist, getAllWishlists, addToWishlist, removeFromWishlist, createWishlist, generateShareLink, getSharedWishlist } = require("../controllers/wishlistController");
+const { protect } = require("../middleware/authMiddleware");
+router.get("/share/:token", getSharedWishlist);
+router.use(protect);
+router.get("/", getWishlist);
+router.get("/all", getAllWishlists);
+router.post("/", addToWishlist);
+router.delete("/:productId", removeFromWishlist);
+router.post("/create", createWishlist);
+router.post("/:id/generate-share-link", generateShareLink);
+module.exports = router;
