@@ -101,74 +101,69 @@ const deprecationMiddleware = (req, res, next) => {
   next();
 };
 
-// ─── v1 Routes (current, supported) ──────────────────────────
-app.use("/api/v1/auth",          require("./routes/authRoutes"));
-app.use("/api/v1/products",      require("./routes/productRoutes"));
-app.use("/api/v1/cart",          require("./routes/cartRoutes"));
-app.use("/api/v1/orders",        require("./routes/orderRoutes"));
-app.use("/api/v1/reviews",       require("./routes/reviewRoutes"));
-// ─── Pillar 5 — Enhanced Reviews ──────────────────────────────
+// ─── v1 Routes (current, supported) ───
+app.use("/api/v1/auth",           require("./routes/authRoutes"));
+app.use("/api/v1/products",       require("./routes/productRoutes"));
+app.use("/api/v1/cart",           require("./routes/cartRoutes"));
+app.use("/api/v1/orders",         require("./routes/orderRoutes"));
+app.use("/api/v1/reviews",        require("./routes/reviewRoutes"));
+
+// Enhanced reviews: two routers split out of enhancedReviewRoutes.js
 const { productReviewRouter, standaloneReviewRouter } = require("./routes/enhancedReviewRoutes");
-app.use("/api/v1/products", productReviewRouter);
-app.use("/api/v1",          standaloneReviewRouter);
-app.use("/api/v1/admin",         require("./routes/adminRoutes"));
-app.use("/api/v1/wishlist",      require("./routes/wishlistRoutes"));
-app.use("/api/v1/users",         require("./routes/userRoutes"));
-app.use("/api/v1/notifications", require("./routes/notificationRoutes"));
-app.use("/api/v1/verification",  require("./routes/verificationRoutes"));
+app.use("/api/v1/products",       productReviewRouter);
+app.use("/api/v1",                standaloneReviewRouter);
+
+app.use("/api/v1/admin",          require("./routes/adminRoutes"));
+app.use("/api/v1/wishlist",       require("./routes/wishlistRoutes"));
+app.use("/api/v1/users",          require("./routes/userRoutes"));
+app.use("/api/v1/notifications",  require("./routes/notificationRoutes"));
+app.use("/api/v1/verification",   require("./routes/verificationRoutes"));
 app.use("/api/v1/upload",         require("./routes/uploadRoutes"));
 app.use("/api/v1/coupons",        require("./routes/couponRoutes"));
-app.use("/api",                   require("./routes/couponRoutes"));
 
-// ─── Pillar 2 — Seller Ecosystem ──────────────────────────────
-// sellerProfileRoutes handles: /shops/*, /seller/*, /admin/seller-profiles/*
-// and /seller/analytics/* (mounted at root to avoid prefix conflicts)
-const sellerProfileRouter = require("./routes/sellerProfileRoutes");
-app.use("/api/v1", sellerProfileRouter);
-app.use("/api",    sellerProfileRouter);   // deprecated alias
+// Route files that declare their own internal path prefixes
+// (e.g. /shops/*, /seller/*, /messages/*, /payouts/*, /admin/*).
+// They mount at /api/v1 root, not under a specific resource prefix.
+app.use("/api/v1",                require("./routes/sellerProfileRoutes"));
+app.use("/api/v1",                require("./routes/messagingRoutes"));
+app.use("/api/v1",                require("./routes/payoutRoutes"));
+app.use("/api/v1",                require("./routes/productModerationRoutes"));
+app.use("/api/v1",                require("./routes/adminAnalyticsRoutes"));
+app.use("/api/v1",                require("./routes/contentModerationRoutes"));
+app.use("/api/v1",                require("./routes/fieldResearchRoutes"));
+app.use("/api/v1",                require("./routes/searchRoutes"));
+app.use("/api/v1",                require("./routes/cityRoutes"));
+app.use("/api/v1",                require("./routes/collectionRoutes"));
+app.use("/api/v1",                require("./routes/recommendationsRoutes"));
 
-app.use("/api/v1", require("./routes/messagingRoutes"));
-app.use("/api",    require("./routes/messagingRoutes"));
+// ─── Deprecated /api/ Aliases (backward compat, 6 months) ───
+// Every alias is wrapped in deprecationMiddleware so old clients receive
+// Sunset + Link headers signaling migration to /api/v1/.
+app.use("/api/auth",              deprecationMiddleware, require("./routes/authRoutes"));
+app.use("/api/products",          deprecationMiddleware, require("./routes/productRoutes"));
+app.use("/api/cart",              deprecationMiddleware, require("./routes/cartRoutes"));
+app.use("/api/orders",            deprecationMiddleware, require("./routes/orderRoutes"));
+app.use("/api/reviews",           deprecationMiddleware, require("./routes/reviewRoutes"));
+app.use("/api/admin",             deprecationMiddleware, require("./routes/adminRoutes"));
+app.use("/api/wishlist",          deprecationMiddleware, require("./routes/wishlistRoutes"));
+app.use("/api/users",             deprecationMiddleware, require("./routes/userRoutes"));
+app.use("/api/notifications",     deprecationMiddleware, require("./routes/notificationRoutes"));
+app.use("/api/verification",      deprecationMiddleware, require("./routes/verificationRoutes"));
+app.use("/api/upload",            deprecationMiddleware, require("./routes/uploadRoutes"));
+app.use("/api/coupons",           deprecationMiddleware, require("./routes/couponRoutes"));
 
-app.use("/api/v1", require("./routes/payoutRoutes"));
-// ─── Pillar 3 — Admin & Verification Infrastructure ───────────
-app.use("/api/v1", require("./routes/productModerationRoutes"));
-app.use("/api",    require("./routes/productModerationRoutes"));
-
-app.use("/api/v1", require("./routes/adminAnalyticsRoutes"));
-app.use("/api",    require("./routes/adminAnalyticsRoutes"));
-
-app.use("/api/v1", require("./routes/contentModerationRoutes"));
-app.use("/api",    require("./routes/contentModerationRoutes"));
-
-app.use("/api/v1", require("./routes/fieldResearchRoutes"));
-// ─── Pillar 4 — Discovery & Search ────────────────────────────
-app.use("/api/v1", require("./routes/searchRoutes"));
-app.use("/api",    require("./routes/searchRoutes"));
-
-app.use("/api/v1", require("./routes/cityRoutes"));
-app.use("/api",    require("./routes/cityRoutes"));
-
-app.use("/api/v1", require("./routes/collectionRoutes"));
-app.use("/api",    require("./routes/collectionRoutes"));
-
-app.use("/api/v1", require("./routes/recommendationsRoutes"));
-app.use("/api",    require("./routes/recommendationsRoutes"));
-app.use("/api",    require("./routes/fieldResearchRoutes"));
-app.use("/api",    require("./routes/payoutRoutes"));
-
-// ─── Deprecated /api/ Aliases (backward compat, 6 months) ────
-app.use("/api/auth",          deprecationMiddleware, require("./routes/authRoutes"));
-app.use("/api/products",      deprecationMiddleware, require("./routes/productRoutes"));
-app.use("/api/cart",          deprecationMiddleware, require("./routes/cartRoutes"));
-app.use("/api/orders",        deprecationMiddleware, require("./routes/orderRoutes"));
-app.use("/api/reviews",       deprecationMiddleware, require("./routes/reviewRoutes"));
-app.use("/api/admin",         deprecationMiddleware, require("./routes/adminRoutes"));
-app.use("/api/wishlist",      deprecationMiddleware, require("./routes/wishlistRoutes"));
-app.use("/api/users",         deprecationMiddleware, require("./routes/userRoutes"));
-app.use("/api/notifications", deprecationMiddleware, require("./routes/notificationRoutes"));
-app.use("/api/verification",  deprecationMiddleware, require("./routes/verificationRoutes"));
-app.use("/api/upload",        deprecationMiddleware, require("./routes/uploadRoutes"));
+// Route files with their own internal prefixes — deprecated alias on /api
+app.use("/api",                   deprecationMiddleware, require("./routes/sellerProfileRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/messagingRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/payoutRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/productModerationRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/adminAnalyticsRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/contentModerationRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/fieldResearchRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/searchRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/cityRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/collectionRoutes"));
+app.use("/api",                   deprecationMiddleware, require("./routes/recommendationsRoutes"));
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get("/", (req, res) => {
