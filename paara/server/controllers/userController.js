@@ -92,16 +92,6 @@ exports.getCulturalJourney = async (req, res) => {
   }
 };
 
-// DELETE /api/v1/users/account  — soft delete (deactivate)
-exports.deleteAccount = async (req, res) => {
-  try {
-    await User.findByIdAndUpdate(req.user._id, { isActive: false, email: `deleted_${Date.now()}_${req.user.email}` });
-    res.json({ success: true, message: "Account deactivated. Contact support to reactivate." });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
 // PATCH /api/v1/users/change-password
 exports.changePassword = async (req, res) => {
   try {
