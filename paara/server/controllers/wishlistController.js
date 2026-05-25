@@ -31,11 +31,16 @@ exports.getAllWishlists = async (req, res) => {
 exports.addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
-    const w = await getOrCreateDefault(req.user._id);
-    const exists = w.items.find((i) => i.product._id?.toString() === productId);
+    let w = await getOrCreateDefault(req.user._id);
+    const exists = w.items.find((i) => {
+      const pid = i.product?._id || i.product;
+      return pid?.toString() === productId;
+    });
     if (!exists) {
       w.items.push({ product: productId });
       await w.save();
+      // Re-fetch with populate so the response includes full product details
+      w = await Wishlist.findById(w._id).populate("items.product", "name price images isActive");
     }
     res.json({ success: true, wishlist: w });
   } catch (err) {
