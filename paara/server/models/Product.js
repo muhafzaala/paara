@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema({
   numSold: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
   // Status
-  status: { type: String, enum: ["pending", "approved", "rejected", "suspended"], default: "approved" },
+  status: { type: String, enum: ["pending", "approved", "rejected", "suspended"], default: "pending" },
   isFeatured: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
   moderationNotes: String,
