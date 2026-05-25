@@ -36,9 +36,52 @@ exports.getUsers = async (req, res) => {
 };
 
 // PATCH /api/v1/admin/users/:id
+// Whitelist: admins can only edit profile fields via this endpoint.
+// Forbidden via this route (must use dedicated endpoints):
+//   - role            → privilege change must go through a dedicated flow
+//   - email           → identity change must go through a verified flow
+//   - password        → users only, via /users/change-password (preserves bcrypt hashing)
+//   - verificationStatus, heritageBadges → use /verification/admin/:id/* endpoints
+//   - twoFactorEnabled, twoFactorSecret, passwordResetToken, passwordResetExpires,
+//     isEmailVerified, emailOtp, emailOtpExpires → auth state, never admin-settable
+//   - addresses       → user-owned, via /users/addresses endpoints
+//   - _id, createdAt, updatedAt, __v → Mongoose internals
+const ADMIN_UPDATABLE_USER_FIELDS = [
+  "name",
+  "phone",
+  "city",
+  "isActive",
+  "shopName",
+  "shopDescription",
+  "shopBanner",
+  "region",
+  "favoriteCategories",
+  "favoriteCities",
+];
+
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select("-password");
+    // Build a safe update payload — only whitelisted fields pass through
+    const updates = {};
+    for (const field of ADMIN_UPDATABLE_USER_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No updatable fields provided. Allowed: " + ADMIN_UPDATABLE_USER_FIELDS.join(", "),
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    ).select("-password");
+
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
     res.json({ success: true, user });
   } catch (err) {
