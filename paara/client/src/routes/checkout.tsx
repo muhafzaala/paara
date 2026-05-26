@@ -9,6 +9,7 @@ import { cartApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
 import ProductImage from "@/components/ProductImage";
+import { PaymentLogo, SupportedBanksRow } from "@/components/site/PaymentLogo";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout · PAARA" }] }),
@@ -191,11 +192,17 @@ function PaymentForm({ payment, setPayment, onBack, onPlace, placing }: any) {
       <div className="space-y-3">
         {methods.map((m) => (
           <button key={m.id} onClick={() => setPayment(m.id)} type="button"
-            className="w-full text-left rounded-2xl p-5 flex items-center gap-4 transition-all border-2"
+            className="w-full text-left rounded-2xl p-5 flex items-start gap-4 transition-all border-2"
             style={{ borderColor: payment === m.id ? "#C9921A" : "rgba(28,58,42,0.1)", background: payment === m.id ? "#FFF8EC" : "#fff" }}>
-            <div className="w-12 h-12 rounded-xl grid place-items-center shrink-0" style={{ background: `${m.color}15`, color: m.color }}><m.icon size={20} /></div>
-            <div className="flex-1"><div className="font-display font-semibold text-[#1C3A2A]">{m.label}</div><div className="text-xs text-[#6B645A] mt-0.5">{m.desc}</div></div>
-            <span className="w-5 h-5 rounded-full border-2 grid place-items-center shrink-0" style={{ borderColor: payment === m.id ? "#C9921A" : "rgba(28,58,42,0.2)" }}>
+            <PaymentLogo id={m.id} fallbackIcon={m.icon} color={m.color} alt={m.label} />
+            <div className="flex-1">
+              <div className="font-display font-semibold text-[#1C3A2A]">{m.label}</div>
+              <div className="text-xs text-[#6B645A] mt-0.5">{m.desc}</div>
+              {m.id === "bank" && (
+                <SupportedBanksRow ids={["hbl", "mcb", "ubl", "allied", "visa", "mastercard"]} />
+              )}
+            </div>
+            <span className="w-5 h-5 rounded-full border-2 grid place-items-center shrink-0 mt-1" style={{ borderColor: payment === m.id ? "#C9921A" : "rgba(28,58,42,0.2)" }}>
               {payment === m.id && <span className="w-2.5 h-2.5 rounded-full bg-[#C9921A]" />}
             </span>
           </button>
