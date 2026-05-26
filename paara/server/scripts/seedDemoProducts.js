@@ -18,7 +18,7 @@ const DEMO_PRODUCTS = [
     stock: 30, material: "Earthenware Clay", craftType: "Kashi-Kari Blue Pottery",
     artisan: "Ustad Muhammad Yousaf",
     originStory: "Multan's kashi-kari tradition dates back to the 14th century, brought by Sufi saints and refined under the Mughals. The signature cobalt and turquoise palette is unique to southern Punjab.",
-    images: ["https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800", "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800"],
+    images: ["/demo-products/multani-blue-pottery-1.jpg"],
   },
   {
     name: "Hunza Walnut Wood Carved Tray",
@@ -28,7 +28,7 @@ const DEMO_PRODUCTS = [
     stock: 25, material: "Mountain Walnut Wood", craftType: "Geometric Wood Carving",
     artisan: "Ghulam Hussain",
     originStory: "Walnut woodcarving in the Hunza valley has been a winter craft for generations, with motifs inspired by Karakoram mountain geometry and Wakhi cultural symbols.",
-    images: ["https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=800", "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=800"],
+    images: ["/demo-products/hunza-walnut-tray-1.jpg"],
   },
   {
     name: "Sindhi Ajrak Shawl",
@@ -38,7 +38,7 @@ const DEMO_PRODUCTS = [
     stock: 40, material: "100% Cotton", craftType: "Ajrak Block Print",
     artisan: "Ali Hassan Soomro",
     originStory: "Ajrak is the cultural emblem of Sindh, with origins traced to the Indus Valley Civilization. Each shawl passes through 16 stages of washing, dyeing, and resist-printing over several weeks.",
-    images: ["https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=800", "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800"],
+    images: ["/demo-products/sindhi-ajrak-1.jpg"],
   },
   {
     name: "Peshawari Copper Pitcher",
@@ -48,7 +48,7 @@ const DEMO_PRODUCTS = [
     stock: 35, material: "Hand-Hammered Copper", craftType: "Naqashi Copper Work",
     artisan: "Haji Faiz Muhammad",
     originStory: "The coppersmiths of Peshawar's Misgaran Bazaar have practiced naqashi — the art of patterned copper hammering — for over 200 years, with techniques passed father-to-son.",
-    images: ["https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800", "https://images.unsplash.com/photo-1606293459339-aa5d34a7b0e1?w=800"],
+    images: ["/demo-products/peshawari-copper-pitcher-1.jpg"],
   },
   {
     name: "Sialkot Hand-Stitched Leather Football",
@@ -58,7 +58,7 @@ const DEMO_PRODUCTS = [
     stock: 50, material: "Genuine Leather", craftType: "Hand-Stitched Sportcraft",
     artisan: "Sialkot Craftsmen's Cooperative",
     originStory: "Sialkot has been the world's hand-stitched football capital since the 1880s. Every FIFA World Cup since 1982 has used balls partially or fully crafted here.",
-    images: ["https://images.unsplash.com/photo-1614632537190-23e4146777db?w=800", "https://images.unsplash.com/photo-1518604666860-9ed391f76460?w=800"],
+    images: ["/demo-products/sialkot-football-1.jpg"],
   },
   {
     name: "Wazirabad Damascus Steel Chef Knife",
@@ -68,7 +68,7 @@ const DEMO_PRODUCTS = [
     stock: 30, material: "Damascus Steel + Walnut", craftType: "Pattern-Welded Bladesmithing",
     artisan: "Muhammad Aslam & Sons",
     originStory: "Wazirabad has been the cutlery capital of South Asia since Mughal times. Modern Wazirabad smiths preserve the ancient pattern-welding technique that produces Damascus steel.",
-    images: ["https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800", "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=800"],
+    images: ["/demo-products/wazirabad-knife-1.jpg"],
   },
   {
     name: "Chiniot Hand-Carved Walnut Side Table",
@@ -78,7 +78,7 @@ const DEMO_PRODUCTS = [
     stock: 15, material: "Solid Walnut Wood", craftType: "Chiniot Wood Carving",
     artisan: "Master Carpenter Allah Ditta",
     originStory: "Chiniot has been Pakistan's furniture-making heartland since the 18th century. Its hand-carved walnut and rosewood pieces graced the courts of Sikh maharajas and Mughal nobles.",
-    images: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800", "https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=800"],
+    images: ["/demo-products/chiniot-side-table-1.jpg"],
   },
   {
     name: "Peshawari Chappal (Hand-Stitched)",
@@ -88,7 +88,7 @@ const DEMO_PRODUCTS = [
     stock: 40, material: "Buffalo Leather", craftType: "Pashtun Footwear",
     artisan: "Khan Saddar Cobblers",
     originStory: "The Peshawari Chappal predates Pakistan itself, traditionally worn by Pashtun tribesmen. Hand-stitching and natural tanning produce footwear that lasts decades and conforms to the foot.",
-    images: ["https://images.unsplash.com/photo-1603487742131-4160ec999306?w=800", "https://images.unsplash.com/photo-1604001307862-2d953b875079?w=800"],
+    images: ["/demo-products/peshawari-chappal-1.jpg"],
   },
   {
     name: "Hunza Apricot Kernel Oil (250ml)",
@@ -98,7 +98,7 @@ const DEMO_PRODUCTS = [
     stock: 50, material: "Wild Apricot Kernel", craftType: "Traditional Cold Pressing",
     artisan: "Hunza Women's Cooperative",
     originStory: "The Hunza people are famed for their longevity, and apricot kernel oil — pressed by local women's cooperatives — is central to their wellness tradition.",
-    images: ["https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800", "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=800"],
+    images: ["/demo-products/hunza-apricot-oil-1.jpg"],
   },
   {
     name: "Kashmiri Pashmina Shawl",
@@ -108,7 +108,7 @@ const DEMO_PRODUCTS = [
     stock: 20, material: "Pure Changthangi Pashmina", craftType: "Kashmiri Handloom",
     artisan: "Rashid Ahmad Pashmina Works",
     originStory: "Pashmina has been Kashmir's signature export since the 15th century, prized by Mughal emperors and European royalty. Each shawl takes 4-6 months to weave by hand.",
-    images: ["https://images.unsplash.com/photo-1601924921557-45e6dea0a157?w=800", "https://images.unsplash.com/photo-1606918842061-1a37a6f5ad14?w=800"],
+    images: ["/demo-products/kashmiri-pashmina-1.jpg"],
   },
   {
     name: "Bahawalpuri Hand-Embroidered Cushion Cover",
@@ -118,7 +118,7 @@ const DEMO_PRODUCTS = [
     stock: 45, material: "Cotton + Silk Embroidery", craftType: "Cholistani Embroidery",
     artisan: "Cholistan Women's Embroidery Guild",
     originStory: "The desert region of Cholistan has a centuries-old embroidery tradition practiced by nomadic women, with motifs reflecting desert flora and tribal heraldry.",
-    images: ["https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=800", "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800"],
+    images: ["/demo-products/bahawalpuri-cushion-1.jpg"],
   },
   {
     name: "Balochi Mirror-Work Wall Tapestry",
@@ -128,7 +128,7 @@ const DEMO_PRODUCTS = [
     stock: 28, material: "Cotton + Glass Mirrors + Silk Thread", craftType: "Balochi Shisha Embroidery",
     artisan: "Mehrgarh Artisan Collective",
     originStory: "Shisha embroidery is a defining Baloch craft, with mirrors stitched into textiles to ward off evil. Patterns are passed mother-to-daughter and carry tribal identity.",
-    images: ["https://images.unsplash.com/photo-1591129841117-3adfd313e34f?w=800", "https://images.unsplash.com/photo-1620912189865-1f5ed7d4d52f?w=800"],
+    images: ["/demo-products/balochi-tapestry-1.jpg"],
   },
   {
     name: "Lahori Hand-Embroidered Khussa",
@@ -138,7 +138,7 @@ const DEMO_PRODUCTS = [
     stock: 40, material: "Leather + Zari Embroidery", craftType: "Khussa Craft",
     artisan: "Anarkali Bazaar Khussa Makers",
     originStory: "The khussa traces to the Mughal courts of Lahore, where it was the courtly footwear of choice. Today's khussa preserves the same flat-soled, embroidered form.",
-    images: ["https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800", "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800"],
+    images: ["/demo-products/lahori-khussa-1.jpg"],
   },
   {
     name: "Karachi Sea-Shell Inlay Jewelry Box",
@@ -148,7 +148,7 @@ const DEMO_PRODUCTS = [
     stock: 35, material: "Mango Wood + Mother-of-Pearl", craftType: "Sindhi Shell Inlay",
     artisan: "Karachi Coastal Craftsmen",
     originStory: "Sindh's coastal craftsmen have inlaid mother-of-pearl in wood for centuries, drawing on the abundance of the Arabian Sea coast for materials.",
-    images: ["https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=800", "https://images.unsplash.com/photo-1564540583246-934409427776?w=800"],
+    images: ["/demo-products/karachi-jewelry-box-1.jpg"],
   },
   {
     name: "Swat Hand-Woven Wool Shawl",
@@ -158,7 +158,7 @@ const DEMO_PRODUCTS = [
     stock: 30, material: "Pure Highland Wool", craftType: "Swati Handloom",
     artisan: "Swat Valley Weavers",
     originStory: "Swat Valley's handloom tradition produced textiles for the Gandharan civilization. Modern Swati weavers preserve the same drawloom techniques across centuries of regional change.",
-    images: ["https://images.unsplash.com/photo-1601924921557-45e6dea0a157?w=800", "https://images.unsplash.com/photo-1601592996763-f05c8c8d6c7e?w=800"],
+    images: ["/demo-products/swat-wool-shawl-1.jpg"],
   },
   {
     name: "Gilgit Lapis Lazuli Pendant Necklace",
@@ -168,7 +168,7 @@ const DEMO_PRODUCTS = [
     stock: 25, material: "Sterling Silver + Lapis Lazuli", craftType: "Northern Areas Lapidary",
     artisan: "Karakoram Gem Crafters",
     originStory: "Lapis lazuli from the Pamir-Karakoram region was traded along the Silk Road for over 6,000 years. Pakistani lapis is among the world's finest, with deep azure flecked by golden pyrite.",
-    images: ["https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800", "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800"],
+    images: ["/demo-products/gilgit-lapis-necklace-1.jpg"],
   },
   {
     name: "Multani Sohan Halwa",
@@ -178,7 +178,7 @@ const DEMO_PRODUCTS = [
     stock: 50, material: "Wheat Flour, Pure Ghee, Sugar, Mixed Nuts", craftType: "Multani Halwa Craft",
     artisan: "Hafiz Sohan Halwa House",
     originStory: "Multan's sohan halwa dates to the 16th century and is one of South Asia's most distinctive sweets. Made by a handful of dedicated halwai families who guard their recipes across generations, each tin carries the city's culinary heritage.",
-    images: ["/demo-products/multani-sohan-halwa-1.jpg", "/demo-products/multani-sohan-halwa-2.jpg"],
+    images: ["/demo-products/multani-sohan-halwa-1.jpg"],
   },
   {
     name: "Mardan Pairay (Traditional Milk Sweet)",
@@ -188,7 +188,7 @@ const DEMO_PRODUCTS = [
     stock: 60, material: "Pure Khoya, Sugar, Cardamom", craftType: "Pashtun Mithai Craft",
     artisan: "Mardan Halwai Cooperative",
     originStory: "Mardan's pairay are famed across Pakistan as the gold standard for milk-based sweets. The town's halwais reduce fresh buffalo milk over wood fires for hours, producing a deeply caramelized, smoky-sweet flavor unique to the region.",
-    images: ["/demo-products/mardan-pairay-1.jpg", "/demo-products/mardan-pairay-2.jpg"],
+    images: ["/demo-products/mardan-pairay-1.jpg"],
   },
   {
     name: "Khushab Dhoda (Special Sweet)",
@@ -198,7 +198,7 @@ const DEMO_PRODUCTS = [
     stock: 50, material: "Gram Flour, Pure Ghee, Sugar, Pistachios, Almonds", craftType: "Khushab Dhoda Craft",
     artisan: "Khushab Heritage Sweet Makers",
     originStory: "Khushab dhoda originated in the 19th century in the small Punjab town of Khushab. Its preparation — slow-simmering gram flour in pure ghee — has remained essentially unchanged for over 150 years, making it a living piece of Punjab's culinary history.",
-    images: ["/demo-products/khushab-dhoda-1.jpg", "/demo-products/khushab-dhoda-2.jpg"],
+    images: ["/demo-products/khushab-dhoda-1.jpg"],
   },
 ];
 
@@ -230,29 +230,42 @@ async function main() {
     console.log(`✓ Demo seller exists (_id: ${demoSeller._id})`);
   }
 
-  // STEP 2 — Seed products. Skip any that already exist by unique (seller, name) tuple.
-  let created = 0, skipped = 0;
+  // STEP 2 — Upsert products. If a product exists, update its images and core fields;
+  // otherwise create it. Always idempotent.
+  let created = 0, updated = 0;
   for (const p of DEMO_PRODUCTS) {
     const exists = await Product.findOne({ seller: demoSeller._id, name: p.name });
     if (exists) {
-      skipped++;
-      continue;
+      // Update just the fields we want re-syncable
+      exists.images = p.images;
+      exists.description = p.description;
+      exists.price = p.price;
+      exists.stock = p.stock;
+      exists.originStory = p.originStory;
+      exists.isDemo = true;
+      exists.status = "approved";
+      exists.isActive = true;
+      if (p.nameUrdu) exists.set("nameUrdu", p.nameUrdu, { strict: false });
+      await exists.save();
+      updated++;
+      console.log(`   🔄 ${p.name} (${p.city})`);
+    } else {
+      await Product.create({
+        ...p,
+        seller: demoSeller._id,
+        status: "approved",
+        isDemo: true,
+        isActive: true,
+        moderationNotes: "Pre-approved demo product.",
+      });
+      created++;
+      console.log(`   ➕ ${p.name} (${p.city})`);
     }
-    await Product.create({
-      ...p,
-      seller: demoSeller._id,
-      status: "approved",
-      isDemo: true,
-      isActive: true,
-      moderationNotes: "Pre-approved demo product.",
-    });
-    created++;
-    console.log(`   ➕ ${p.name} (${p.city})`);
   }
 
   console.log("─── Summary ──────────────────────────────────────────────");
   console.log(`   Created: ${created}`);
-  console.log(`   Skipped (already existed): ${skipped}`);
+  console.log(`   Updated: ${updated}`);
   console.log(`   Total demo products in DB: ${await Product.countDocuments({ isDemo: true })}`);
   console.log("──────────────────────────────────────────────────────────");
 

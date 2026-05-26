@@ -8,6 +8,7 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import ProductImage from "@/components/ProductImage";
 import WelcomeBanner from "@/components/site/WelcomeBanner";
+import DemoBadge from "@/components/DemoBadge";
 
 import badshahiBg from "@/assets/cities/Badshahi.jpg";
 import islamabadBg from "@/assets/cities/Islamabad.jpg";
@@ -408,7 +409,10 @@ function FeaturedProducts() {
         return (
           <Link key={id} to="/products/$id" params={{ id }} className="paara-card block group">
             <div className="img-wrap">
-              <ProductImage src={img} alt={p.name} size="md" />
+              <div className="relative w-full h-full">
+                {p.isDemo && <DemoBadge position="top-left" />}
+                <ProductImage src={img} alt={p.name} size="md" />
+              </div>
             </div>
             <div className="p-5">
               <p className="eyebrow mb-2">{p.city || p.region}</p>

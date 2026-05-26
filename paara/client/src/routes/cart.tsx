@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-store";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ProductImage from "@/components/ProductImage";
+import DemoBadge from "@/components/DemoBadge";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Cart · PAARA" }] }),
@@ -126,7 +127,8 @@ function CartPage() {
                 const img = p.img || p.images?.[0];
                 return (
                   <div key={p.id} className="bg-white rounded-[20px] p-5 flex gap-5 shadow-[var(--shadow-soft)] border border-[rgba(28,58,42,0.06)]">
-                    <Link to="/products/$id" params={{ id: p.id }} className="flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-[14px] overflow-hidden bg-[#FFF8EC]">
+                    <Link to="/products/$id" params={{ id: p.id }} className="relative flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-[14px] overflow-hidden bg-[#FFF8EC]">
+                      {p.isDemo && <DemoBadge position="top-left" size="sm" />}
                       <ProductImage src={img} alt={p.name} size="sm" className="hover:scale-105 transition-transform duration-500" />
                     </Link>
                     <div className="flex-1 min-w-0">

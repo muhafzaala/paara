@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-store";
 import { wishlistApi } from "@/lib/api";
 import { toast } from "sonner";
 import ProductImage from "@/components/ProductImage";
+import DemoBadge from "@/components/DemoBadge";
 
 export const Route = createFileRoute("/products")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -176,6 +177,7 @@ function ProductsPage() {
                   return (
                     <Link key={id} to="/products/$id" params={{ id }} className="paara-card block group">
                       <div className="img-wrap relative">
+                        {p.isDemo && <DemoBadge position="top-left" />}
                         <ProductImage src={img} alt={p.name} size="md" />
                         {p.isHeritageVerified && (
                           <span className="absolute top-3 left-3 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-[0.15em] bg-[#C9921A] text-[#1C3A2A]">

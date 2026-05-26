@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart-store";
 import { formatPKR } from "@/lib/products";
 import { toast } from "sonner";
 import ProductImage from "@/components/ProductImage";
+import DemoBadge from "@/components/DemoBadge";
 
 export const Route = createFileRoute("/account/wishlist")({ component: WishlistPage });
 
@@ -54,7 +55,8 @@ function WishlistPage() {
               if (!p) return null;
               return (
                 <div key={p._id} className="bg-white rounded-[20px] overflow-hidden border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
-                  <Link to="/products/$id" params={{ id: p._id }} className="block aspect-[4/3] overflow-hidden">
+                  <Link to="/products/$id" params={{ id: p._id }} className="relative block aspect-[4/3] overflow-hidden">
+                    {p.isDemo && <DemoBadge position="top-left" />}
                     <ProductImage src={p.images?.[0]} alt={p.name} size="md" className="hover:scale-105 transition-transform duration-500" />
                   </Link>
                   <div className="p-4">
