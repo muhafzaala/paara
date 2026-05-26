@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
+const SellerProfile = require("../models/SellerProfile");
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || "7d" });
@@ -30,11 +31,16 @@ exports.register = async (req, res) => {
     const user = await User.create({
       name, email, password,
       role: userRole,
-      shopName: shopName || "",
       city: city || "",
       emailOtp: hashOtp(otp),
       emailOtpExpires: Date.now() + 10 * 60 * 1000, // 10 min
     });
+
+    // Auto-create empty SellerProfile for seller-role registrations so
+    // the onboarding wizard has a record to write into.
+    if (user.role === "seller") {
+      await SellerProfile.create({ user: user._id });
+    }
 
     // In production replace `otp` with an email send; never expose it in the response
     res.status(201).json({
