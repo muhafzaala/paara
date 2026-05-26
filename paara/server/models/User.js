@@ -19,18 +19,6 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, default: "" },
   city: { type: String, default: "" },
 
-  // Seller fields
-  shopName: { type: String, default: "" },
-  shopDescription: { type: String, default: "" },
-  shopBanner: { type: String, default: "" },
-  region: { type: String, default: "" },
-  verificationStatus: {
-    type: String,
-    enum: ["none", "pending", "under_review", "field_visit", "approved", "rejected", "suspended"],
-    default: "none",
-  },
-  heritageBadges: [String],
-
   // Buyer profile
   addresses: [addressSchema],
   favoriteCategories: [String],
