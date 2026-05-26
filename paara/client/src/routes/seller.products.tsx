@@ -5,6 +5,7 @@ import { Plus, Edit3, Trash2, Loader2, Package } from "lucide-react";
 import { formatPKR, CATEGORIES } from "@/lib/products";
 import { productsApi } from "@/lib/api";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/seller/products")({ component: SellerProductsPage });
 
@@ -107,7 +108,7 @@ function SellerProductsPage() {
             {(data || []).map((p: any) => (
               <div key={p._id} className="bg-white rounded-[20px] overflow-hidden border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
                 <div className="h-40 bg-[#FFF8EC] overflow-hidden">
-                  {p.images?.[0] && <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />}
+                  <ProductImage src={p.images?.[0]} alt={p.name} size="sm" />
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-1">

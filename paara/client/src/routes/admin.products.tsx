@@ -5,6 +5,7 @@ import { CheckCircle2, XCircle, AlertTriangle, Loader2, Package } from "lucide-r
 import { formatPKR } from "@/lib/products";
 import { adminApi } from "@/lib/api";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/admin/products")({ component: AdminProducts });
 
@@ -46,7 +47,7 @@ function AdminProducts() {
           <div className="space-y-3">
             {(data || []).map((p: any) => (
               <div key={p._id} className="bg-[rgba(245,237,216,0.06)] rounded-[16px] p-4 flex items-center gap-4 border border-[rgba(201,146,26,0.1)]">
-                {p.images?.[0] && <img src={p.images[0]} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />}
+                <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0"><ProductImage src={p.images?.[0]} alt="" size="sm" /></div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-[#F5EDD8] truncate">{p.name}</p>
                   <p className="text-xs text-[rgba(245,237,216,0.55)]">{p.city} · {p.category} · {p.seller?.name}</p>

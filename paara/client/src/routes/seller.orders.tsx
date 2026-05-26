@@ -5,6 +5,7 @@ import { Loader2, Receipt } from "lucide-react";
 import { formatPKR } from "@/lib/products";
 import { ordersApi } from "@/lib/api";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/seller/orders")({ component: SellerOrdersPage });
 
@@ -63,7 +64,7 @@ function SellerOrdersPage() {
                 <div className="flex gap-3 mb-4 overflow-x-auto pb-1">
                   {order.items?.map((item: any, i: number) => (
                     <div key={i} className="flex-shrink-0 flex items-center gap-2 text-xs text-[#3D2914]">
-                      {item.image && <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                      <div className="w-10 h-10 rounded-lg overflow-hidden"><ProductImage src={item.image} alt="" size="sm" /></div>
                       <div><p className="font-medium">{item.name}</p><p className="text-[#6B645A]">×{item.quantity}</p></div>
                     </div>
                   ))}

@@ -8,6 +8,7 @@ import { formatPKR } from "@/lib/products";
 import { cartApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout · PAARA" }] }),
@@ -92,7 +93,7 @@ function CheckoutPage() {
                     {items.map((i) => (
                       <div key={i.product.id} className="flex gap-3 items-center">
                         <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#FFF8EC] shrink-0 relative">
-                          <img src={i.product.img} alt="" className="w-full h-full object-cover" />
+                          <ProductImage src={i.product.img} alt="" size="sm" />
                           <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#1C3A2A] text-[#F5EDD8] text-[10px] grid place-items-center font-medium">{i.quantity}</span>
                         </div>
                         <div className="flex-1 min-w-0">

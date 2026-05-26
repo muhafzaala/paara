@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-store";
 import { useAuth } from "@/lib/auth-store";
 import { formatPKR } from "@/lib/products";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/wishlist")({ component: WishlistPage });
 
@@ -73,7 +74,7 @@ function WishlistPage() {
                 return (
                   <div key={p._id} className="paara-card">
                     <Link to="/products/$id" params={{ id: p._id }} className="block">
-                      <div className="img-wrap"><img src={p.images?.[0]} alt={p.name} /></div>
+                      <div className="img-wrap"><ProductImage src={p.images?.[0]} alt={p.name} size="md" /></div>
                     </Link>
                     <div className="p-5">
                       <p className="eyebrow mb-1">{p.city}</p>

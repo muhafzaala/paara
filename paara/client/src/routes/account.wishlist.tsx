@@ -5,6 +5,7 @@ import { wishlistApi, cartApi } from "@/lib/api";
 import { useCart } from "@/lib/cart-store";
 import { formatPKR } from "@/lib/products";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/account/wishlist")({ component: WishlistPage });
 
@@ -54,7 +55,7 @@ function WishlistPage() {
               return (
                 <div key={p._id} className="bg-white rounded-[20px] overflow-hidden border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
                   <Link to="/products/$id" params={{ id: p._id }} className="block aspect-[4/3] overflow-hidden">
-                    <img src={p.images?.[0]} alt={p.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                    <ProductImage src={p.images?.[0]} alt={p.name} size="md" className="hover:scale-105 transition-transform duration-500" />
                   </Link>
                   <div className="p-4">
                     <p className="eyebrow mb-1">{p.city}</p>

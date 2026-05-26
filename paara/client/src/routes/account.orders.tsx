@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Package, Truck, Check, Clock, X, Loader2, ArrowRight } from "lucide-react";
 import { ordersApi } from "@/lib/api";
 import { formatPKR } from "@/lib/products";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/account/orders")({ component: OrdersPage });
 
@@ -78,7 +79,7 @@ function OrdersPage() {
                 <div className="flex gap-3 overflow-x-auto pb-1 mb-4">
                   {order.items?.slice(0, 4).map((item: any, i: number) => (
                     <div key={i} className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-[#FFF8EC]">
-                      {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                      <ProductImage src={item.image} alt={item.name} size="sm" />
                     </div>
                   ))}
                   {order.items?.length > 4 && (

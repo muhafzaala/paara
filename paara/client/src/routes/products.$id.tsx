@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart-store";
 import { productsApi, reviewsApi, cartApi, wishlistApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
+import ProductImage from "@/components/ProductImage";
 
 export const Route = createFileRoute("/products/$id")({
   component: ProductDetailPage,
@@ -159,7 +160,7 @@ function ProductDetailPage() {
             {/* Gallery */}
             <div>
               <div className="aspect-square rounded-[24px] overflow-hidden mb-4 bg-[#FFF8EC] relative">
-                <img src={galleryImages[activeImg]} alt={p.name} className="w-full h-full object-cover transition-opacity duration-500" />
+                <ProductImage src={galleryImages[activeImg]} alt={p.name} size="lg" className="transition-opacity duration-500" />
                 {p.isHeritageVerified && (
                   <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9921A] text-[#1C3A2A] text-xs font-bold">
                     <Shield size={12} /> Heritage Verified
