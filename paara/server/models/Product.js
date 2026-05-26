@@ -41,6 +41,7 @@ const productSchema = new mongoose.Schema({
   // Status
   status: { type: String, enum: ["pending", "approved", "rejected", "suspended"], default: "pending" },
   isFeatured: { type: Boolean, default: false },
+  isDemo: { type: Boolean, default: false, index: true },
   isActive: { type: Boolean, default: true },
   moderationNotes: String,
 }, { timestamps: true });
