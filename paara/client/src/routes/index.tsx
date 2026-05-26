@@ -7,6 +7,7 @@ import { formatPKR } from "@/lib/products";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import ProductImage from "@/components/ProductImage";
+import WelcomeBanner from "@/components/site/WelcomeBanner";
 
 import badshahiBg from "@/assets/cities/Badshahi.jpg";
 import islamabadBg from "@/assets/cities/Islamabad.jpg";
@@ -70,6 +71,7 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-[#F5EDD8]">
       <Nav />
+      <WelcomeBanner />
 
       {/* HERO */}
       <section className="relative h-[100vh] min-h-[720px] overflow-hidden">

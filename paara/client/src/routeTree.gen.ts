@@ -52,6 +52,7 @@ import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
 import { Route as AccountSettingsRouteImport } from './routes/account.settings'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountAddressesRouteImport } from './routes/account.addresses'
+import { Route as AccountOrdersIdRouteImport } from './routes/account.orders.$id'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -268,6 +269,11 @@ const AccountAddressesRoute = AccountAddressesRouteImport.update({
   path: '/addresses',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountOrdersIdRoute = AccountOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AccountOrdersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -296,7 +302,7 @@ export interface FileRoutesByFullPath {
   '/verification': typeof VerificationRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
-  '/account/orders': typeof AccountOrdersRoute
+  '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -313,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -338,7 +345,7 @@ export interface FileRoutesByTo {
   '/verification': typeof VerificationRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
-  '/account/orders': typeof AccountOrdersRoute
+  '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/seller': typeof SellerIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -384,7 +392,7 @@ export interface FileRoutesById {
   '/verification': typeof VerificationRoute
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
-  '/account/orders': typeof AccountOrdersRoute
+  '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
+  '/account/orders/$id': typeof AccountOrdersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/admin/'
     | '/seller/'
+    | '/account/orders/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/seller'
+    | '/account/orders/$id'
   id:
     | '__root__'
     | '/'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/admin/'
     | '/seller/'
+    | '/account/orders/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -868,12 +880,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAddressesRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/orders/$id': {
+      id: '/account/orders/$id'
+      path: '/$id'
+      fullPath: '/account/orders/$id'
+      preLoaderRoute: typeof AccountOrdersIdRouteImport
+      parentRoute: typeof AccountOrdersRoute
+    }
   }
 }
 
+interface AccountOrdersRouteChildren {
+  AccountOrdersIdRoute: typeof AccountOrdersIdRoute
+}
+
+const AccountOrdersRouteChildren: AccountOrdersRouteChildren = {
+  AccountOrdersIdRoute: AccountOrdersIdRoute,
+}
+
+const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
+  AccountOrdersRouteChildren,
+)
+
 interface AccountRouteChildren {
   AccountAddressesRoute: typeof AccountAddressesRoute
-  AccountOrdersRoute: typeof AccountOrdersRoute
+  AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
   AccountSettingsRoute: typeof AccountSettingsRoute
   AccountWishlistRoute: typeof AccountWishlistRoute
   AccountIndexRoute: typeof AccountIndexRoute
@@ -881,7 +912,7 @@ interface AccountRouteChildren {
 
 const AccountRouteChildren: AccountRouteChildren = {
   AccountAddressesRoute: AccountAddressesRoute,
-  AccountOrdersRoute: AccountOrdersRoute,
+  AccountOrdersRoute: AccountOrdersRouteWithChildren,
   AccountSettingsRoute: AccountSettingsRoute,
   AccountWishlistRoute: AccountWishlistRoute,
   AccountIndexRoute: AccountIndexRoute,
