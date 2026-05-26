@@ -1,11 +1,10 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Product = require("../models/Product");
 
 const DEMO_SELLER_EMAIL = "demo.artisans@paara.pk";
-const DEMO_SELLER_PASSWORD = "DemoArtisans2026!";
+const DEMO_SELLER_PASSWORD = "Demo123!";
 
 // 16 authentic Pakistani regional crafts. Each product is owned by the demo seller,
 // pre-approved, and marked isDemo so the frontend can render a "DEMO" badge.
@@ -211,11 +210,10 @@ async function main() {
   let demoSeller = await User.findOne({ email: DEMO_SELLER_EMAIL });
   if (!demoSeller) {
     console.log("🪡 Creating demo seller account...");
-    const hashedPassword = await bcrypt.hash(DEMO_SELLER_PASSWORD, 10);
     demoSeller = await User.create({
       name: "PAARA Demo Artisans",
       email: DEMO_SELLER_EMAIL,
-      password: hashedPassword,
+      password: DEMO_SELLER_PASSWORD, // Mongoose pre-save hook will hash it
       role: "seller",
       shopName: "PAARA Demo Artisans Collective",
       shopDescription: "Showcase storefront for PAARA's curated heritage crafts. Demonstration products only.",
