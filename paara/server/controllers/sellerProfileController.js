@@ -1,17 +1,30 @@
-const User    = require("../models/User");
-const Product = require("../models/Product");
-const Order   = require("../models/Order");
-const Review  = require("../models/Review");
+const User          = require("../models/User");
+const SellerProfile = require("../models/SellerProfile");
+const Product       = require("../models/Product");
+const Order         = require("../models/Order");
+const Review        = require("../models/Review");
+
+// Helper — fetch or auto-create empty profile (for sellers who registered before migration)
+async function ensureProfile(userId) {
+  let profile = await SellerProfile.findOne({ user: userId });
+  if (!profile) profile = await SellerProfile.create({ user: userId });
+  return profile;
+}
 
 // GET /api/v1/shops/:id  — Public seller profile
 exports.getPublicSellerProfile = async (req, res) => {
   try {
     const seller = await User.findOne({ _id: req.params.id, role: "seller" })
-      .select("name shopName shopDescription shopBanner avatar city region verificationStatus heritageBadges createdAt");
+      .select("name avatar city createdAt");
     if (!seller) return res.status(404).json({ success: false, message: "Shop not found" });
 
+    const profile = await SellerProfile.findOne({ user: req.params.id });
+    if (!profile || !profile.isVisible) {
+      return res.status(404).json({ success: false, message: "Shop not found" });
+    }
+
     const products = await Product.find({ seller: req.params.id, status: "approved", isActive: true })
-      .select("name price images rating numReviews city category artisan")
+      .select("name price images rating numReviews city category artisan isDemo")
       .sort({ createdAt: -1 });
 
     const totalSold = await Order.aggregate([
@@ -30,7 +43,24 @@ exports.getPublicSellerProfile = async (req, res) => {
 
     res.json({
       success: true,
-      seller,
+      seller: {
+        _id: seller._id,
+        name: seller.name,
+        avatar: seller.avatar,
+        // Shop fields now live on profile
+        shopName: profile.shopName,
+        shopDescription: profile.shopDescription,
+        shopBanner: profile.shopBanner,
+        shopLogo: profile.shopLogo,
+        shopStory: profile.shopStory,
+        yearEstablished: profile.yearEstablished,
+        city: profile.city || seller.city,
+        region: profile.region,
+        craftSpecialties: profile.craftSpecialties,
+        verificationStatus: profile.verificationStatus,
+        heritageBadges: profile.heritageBadges,
+        memberSince: seller.createdAt,
+      },
       products,
       stats: {
         totalProducts: products.length,
@@ -48,6 +78,7 @@ exports.getPublicSellerProfile = async (req, res) => {
 // GET /api/v1/seller/dashboard  (seller)
 exports.getSellerDashboard = async (req, res) => {
   try {
+    const profile = await ensureProfile(req.user._id);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
     const [totalOrders, pendingOrders, totalProducts, activeProducts, revenue30d, recentOrders] = await Promise.all([
@@ -74,6 +105,10 @@ exports.getSellerDashboard = async (req, res) => {
         totalProducts,
         activeProducts,
         revenue30d: revenue30d[0]?.total || 0,
+        verificationStatus: profile.verificationStatus,
+        verificationStage: profile.verificationStage,
+        shopName: profile.shopName,
+        heritageBadges: profile.heritageBadges,
       },
       recentOrders,
     });
@@ -135,18 +170,57 @@ exports.getSellerOrders = async (req, res) => {
 exports.getAllSellerProfiles = async (req, res) => {
   try {
     const { page = 1, limit = 20, verificationStatus } = req.query;
-    const query = { role: "seller" };
+    const query = {};
     if (verificationStatus) query.verificationStatus = verificationStatus;
 
-    const total = await User.countDocuments(query);
-    const sellers = await User.find(query)
-      .select("-password -twoFactorSecret")
+    const total = await SellerProfile.countDocuments(query);
+    const profiles = await SellerProfile.find(query)
+      .populate("user", "name email avatar phone isActive createdAt")
       .sort({ createdAt: -1 })
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit));
 
-    res.json({ success: true, sellers, total });
+    res.json({ success: true, sellers: profiles, total });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// GET /api/v1/seller/profile  (seller) — read own profile
+exports.getMyProfile = async (req, res) => {
+  try {
+    const profile = await ensureProfile(req.user._id);
+    res.json({ success: true, profile });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// PATCH /api/v1/seller/profile  (seller) — update own profile
+exports.updateMyProfile = async (req, res) => {
+  try {
+    const profile = await ensureProfile(req.user._id);
+
+    // Whitelist allowed fields — never let the seller change verificationStatus or badges directly
+    const ALLOWED = [
+      "shopName", "shopDescription", "shopBanner", "shopLogo", "yearEstablished",
+      "shopStory", "city", "region", "craftSpecialties", "languagesSpoken", "isVisible",
+    ];
+    for (const field of ALLOWED) {
+      if (req.body[field] !== undefined) profile[field] = req.body[field];
+    }
+    // Bank details are nested
+    if (req.body.bank) {
+      profile.bank = { ...profile.bank, ...req.body.bank };
+    }
+    // Documents are nested
+    if (req.body.documents) {
+      profile.documents = { ...profile.documents, ...req.body.documents };
+    }
+
+    await profile.save();
+    res.json({ success: true, profile });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
