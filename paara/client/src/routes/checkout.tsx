@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Check, ArrowRight, ArrowLeft, Wallet, Smartphone, Banknote, Truck, ShieldCheck, Loader2 } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Wallet, Smartphone, Banknote, Truck, ShieldCheck, Loader2, CreditCard } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/lib/cart-store";
@@ -26,7 +26,7 @@ function CheckoutPage() {
   const { user } = useAuth();
   const [step, setStep] = useState<Step>(0);
   const [shipping, setShipping] = useState({ name: "", phone: "", street: "", city: "", province: "Punjab", postalCode: "" });
-  const [payment, setPayment] = useState<"jazzcash" | "easypaisa" | "bank" | "cod">("cod");
+  const [payment, setPayment] = useState<"jazzcash" | "easypaisa" | "card" | "bank" | "cod">("cod");
   const [orderId, setOrderId] = useState("");
   const [placing, setPlacing] = useState(false);
 
@@ -182,6 +182,7 @@ function PaymentForm({ payment, setPayment, onBack, onPlace, placing }: any) {
   const methods = [
     { id: "jazzcash", label: "JazzCash", desc: "Pay from your JazzCash wallet", icon: Smartphone, color: "#C4622D" },
     { id: "easypaisa", label: "EasyPaisa", desc: "Pay from your EasyPaisa wallet", icon: Wallet, color: "#1B4F8A" },
+    { id: "card", label: "Debit / Credit Card", desc: "Visa & Mastercard accepted", icon: CreditCard, color: "#1A3A8B" },
     { id: "bank", label: "Bank Transfer", desc: "Direct transfer · 1–2 business days", icon: Banknote, color: "#2A5C3F" },
     { id: "cod", label: "Cash on Delivery", desc: "Pay in cash on delivery", icon: Truck, color: "#B5651D" },
   ];
@@ -198,6 +199,9 @@ function PaymentForm({ payment, setPayment, onBack, onPlace, placing }: any) {
             <div className="flex-1">
               <div className="font-display font-semibold text-[#1C3A2A]">{m.label}</div>
               <div className="text-xs text-[#6B645A] mt-0.5">{m.desc}</div>
+              {m.id === "card" && (
+                <SupportedBanksRow ids={["visa", "mastercard"]} />
+              )}
               {m.id === "bank" && (
                 <SupportedBanksRow ids={["hbl", "mcb", "ubl", "allied", "visa", "mastercard"]} />
               )}
