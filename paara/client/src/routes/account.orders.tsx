@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Truck, Check, Clock, X, Loader2, ArrowRight } from "lucide-react";
@@ -20,6 +20,8 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; icon: typeof Pac
 const TABS = ["All", "pending", "dispatched", "delivered", "cancelled"] as const;
 
 function OrdersPage() {
+  // ALL hooks must be called unconditionally on every render.
+  const matchRoute = useMatchRoute();
   const [tab, setTab] = useState<string>("All");
   const { data, isLoading } = useQuery({
     queryKey: ["my-orders"],
@@ -27,6 +29,10 @@ function OrdersPage() {
       try { return (await ordersApi.getMyOrders()).data.orders; } catch { return []; }
     },
   });
+
+  // Conditional render AFTER all hooks have run.
+  const isDetailRoute = matchRoute({ to: "/account/orders/$id", fuzzy: true });
+  if (isDetailRoute) return <Outlet />;
 
   const orders = (data || []).filter((o: any) => tab === "All" || o.status === tab);
 
@@ -90,7 +96,7 @@ function OrdersPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-[#6B645A]">{order.items?.length} item{order.items?.length !== 1 ? "s" : ""}</p>
-                  <Link to="/account/orders" className="text-xs text-[#C9921A] font-semibold flex items-center gap-1 hover:underline">
+                  <Link to="/account/orders/$id" params={{ id: order._id }} className="text-xs text-[#C9921A] font-semibold flex items-center gap-1 hover:underline">
                     Track order <ArrowRight size={12} />
                   </Link>
                 </div>
