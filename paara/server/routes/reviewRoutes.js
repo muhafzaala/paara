@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { createReview, voteHelpful, sellerResponse, getMyReviews } = require("../controllers/reviewController");
+const { createReview, voteHelpful, sellerResponse, getMyReviews, reportReview, sellerRespond } = require("../controllers/reviewController");
 const { protect, sellerOrAdmin } = require("../middleware/authMiddleware");
 router.use(protect);
 router.post("/", createReview);
 router.get("/user/my-reviews", getMyReviews);
 router.patch("/:id/helpful", voteHelpful);
 router.patch("/:id/seller-response", sellerOrAdmin, sellerResponse);
+router.post("/:id/report", reportReview);
+router.patch("/:id/respond", sellerRespond);
 module.exports = router;

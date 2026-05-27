@@ -13,6 +13,9 @@ const reviewSchema = new mongoose.Schema({
   helpfulVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   unhelpfulVotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   isApproved: { type: Boolean, default: true },
+  verifiedPurchase: { type: Boolean, default: false },
+  sellerResponse: { type: String, default: "" },
+  reportedBy: [{ user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, reason: String, at: { type: Date, default: Date.now } }],
 }, { timestamps: true });
 
 reviewSchema.index({ product: 1, user: 1 }, { unique: true });

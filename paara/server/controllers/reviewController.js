@@ -87,3 +87,28 @@ exports.getMyReviews = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// POST /api/v1/reviews/:id/report
+exports.reportReview = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const r = await Review.findById(req.params.id);
+    if (!r) return res.status(404).json({ success: false, message: "Not found" });
+    r.reportedBy.push({ user: req.user._id, reason });
+    if (r.reportedBy.length >= 3) r.isApproved = false;
+    await r.save();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+// PATCH /api/v1/reviews/:id/respond  (seller)
+exports.sellerRespond = async (req, res) => {
+  try {
+    const r = await Review.findById(req.params.id).populate("product", "seller");
+    if (!r) return res.status(404).json({ success: false, message: "Not found" });
+    if (String(r.product.seller) !== String(req.user._id)) return res.status(403).json({ success: false, message: "Not your product" });
+    r.sellerResponse = req.body.response || "";
+    await r.save();
+    res.json({ success: true, review: r });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
