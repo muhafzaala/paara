@@ -37,10 +37,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SellerIndexRouteImport } from './routes/seller.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as SellerVerificationStatusRouteImport } from './routes/seller.verification-status'
 import { Route as SellerSettingsRouteImport } from './routes/seller.settings'
 import { Route as SellerProductsRouteImport } from './routes/seller.products'
 import { Route as SellerPayoutsRouteImport } from './routes/seller.payouts'
 import { Route as SellerOrdersRouteImport } from './routes/seller.orders'
+import { Route as SellerOnboardingRouteImport } from './routes/seller.onboarding'
 import { Route as SellerAnalyticsRouteImport } from './routes/seller.analytics'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -194,6 +196,12 @@ const AccountIndexRoute = AccountIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AccountRoute,
 } as any)
+const SellerVerificationStatusRoute =
+  SellerVerificationStatusRouteImport.update({
+    id: '/verification-status',
+    path: '/verification-status',
+    getParentRoute: () => SellerRoute,
+  } as any)
 const SellerSettingsRoute = SellerSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -212,6 +220,11 @@ const SellerPayoutsRoute = SellerPayoutsRouteImport.update({
 const SellerOrdersRoute = SellerOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => SellerRoute,
+} as any)
+const SellerOnboardingRoute = SellerOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => SellerRoute,
 } as any)
 const SellerAnalyticsRoute = SellerAnalyticsRouteImport.update({
@@ -312,10 +325,12 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/verification-status': typeof SellerVerificationStatusRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
@@ -355,10 +370,12 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/verification-status': typeof SellerVerificationStatusRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/seller': typeof SellerIndexRoute
@@ -402,10 +419,12 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
+  '/seller/verification-status': typeof SellerVerificationStatusRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
@@ -450,10 +469,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
     | '/seller/products'
     | '/seller/settings'
+    | '/seller/verification-status'
     | '/account/'
     | '/admin/'
     | '/seller/'
@@ -493,10 +514,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
     | '/seller/products'
     | '/seller/settings'
+    | '/seller/verification-status'
     | '/account'
     | '/admin'
     | '/seller'
@@ -539,10 +562,12 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
     | '/seller/products'
     | '/seller/settings'
+    | '/seller/verification-status'
     | '/account/'
     | '/admin/'
     | '/seller/'
@@ -775,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/seller/verification-status': {
+      id: '/seller/verification-status'
+      path: '/verification-status'
+      fullPath: '/seller/verification-status'
+      preLoaderRoute: typeof SellerVerificationStatusRouteImport
+      parentRoute: typeof SellerRoute
+    }
     '/seller/settings': {
       id: '/seller/settings'
       path: '/settings'
@@ -801,6 +833,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/seller/orders'
       preLoaderRoute: typeof SellerOrdersRouteImport
+      parentRoute: typeof SellerRoute
+    }
+    '/seller/onboarding': {
+      id: '/seller/onboarding'
+      path: '/onboarding'
+      fullPath: '/seller/onboarding'
+      preLoaderRoute: typeof SellerOnboardingRouteImport
       parentRoute: typeof SellerRoute
     }
     '/seller/analytics': {
@@ -955,19 +994,23 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 
 interface SellerRouteChildren {
   SellerAnalyticsRoute: typeof SellerAnalyticsRoute
+  SellerOnboardingRoute: typeof SellerOnboardingRoute
   SellerOrdersRoute: typeof SellerOrdersRoute
   SellerPayoutsRoute: typeof SellerPayoutsRoute
   SellerProductsRoute: typeof SellerProductsRoute
   SellerSettingsRoute: typeof SellerSettingsRoute
+  SellerVerificationStatusRoute: typeof SellerVerificationStatusRoute
   SellerIndexRoute: typeof SellerIndexRoute
 }
 
 const SellerRouteChildren: SellerRouteChildren = {
   SellerAnalyticsRoute: SellerAnalyticsRoute,
+  SellerOnboardingRoute: SellerOnboardingRoute,
   SellerOrdersRoute: SellerOrdersRoute,
   SellerPayoutsRoute: SellerPayoutsRoute,
   SellerProductsRoute: SellerProductsRoute,
   SellerSettingsRoute: SellerSettingsRoute,
+  SellerVerificationStatusRoute: SellerVerificationStatusRoute,
   SellerIndexRoute: SellerIndexRoute,
 }
 

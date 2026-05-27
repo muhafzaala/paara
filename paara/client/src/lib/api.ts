@@ -168,6 +168,9 @@ export const adminApi = {
 
 export const sellerApi = {
   getDashboard: () => api.get("/seller/dashboard"),
+  getMyProfile: () => api.get("/seller/profile"),
+  updateMyProfile: (data: object) => api.patch("/seller/profile", data),
+  submitApplication: () => api.post("/seller/profile/submit-application"),
   getOrders: (params?: object) => api.get("/seller/orders", { params }),
   getAnalytics: () => api.get("/seller/analytics"),
   getPayouts: () => api.get("/payouts/seller"),
