@@ -1,7 +1,9 @@
+const AuditLog = require("../models/AuditLog");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const Review = require("../models/Review");
+const SellerProfile = require("../models/SellerProfile");
 
 // GET /api/v1/admin/dashboard
 exports.getDashboard = async (req, res) => {
@@ -201,6 +203,44 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+};
+
+// GET /api/v1/admin/audit-log
+exports.getAuditLog = async (req, res) => {
+  try {
+    const { page = 1, limit = 50, action, actorRole } = req.query;
+    const q = {};
+    if (action) q.action = action;
+    if (actorRole) q.actorRole = actorRole;
+    const total = await AuditLog.countDocuments(q);
+    const logs = await AuditLog.find(q).sort({ createdAt: -1 })
+      .skip((Number(page) - 1) * Number(limit)).limit(Number(limit))
+      .populate("actor", "name email");
+    res.json({ success: true, logs, total });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+// GET /api/v1/admin/platform-stats
+exports.getPlatformStats = async (req, res) => {
+  try {
+    const [users, sellers, products, orders, revenue] = await Promise.all([
+      User.countDocuments({}),
+      SellerProfile.countDocuments({ verificationStatus: "approved" }),
+      Product.countDocuments({ status: "approved", isActive: true }),
+      Order.countDocuments({}),
+      Order.aggregate([{ $match: { "payment.status": "paid" } }, { $group: { _id: null, total: { $sum: "$pricing.total" } } }]),
+    ]);
+    const recentOrders = await Order.find({}).sort({ createdAt: -1 }).limit(10).populate("buyer", "name");
+    const ordersByStatus = await Order.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]);
+    res.json({
+      success: true,
+      stats: {
+        totalUsers: users, verifiedSellers: sellers, activeProducts: products,
+        totalOrders: orders, totalRevenue: revenue[0]?.total || 0,
+      },
+      recentOrders, ordersByStatus,
+    });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };
 
 // GET /api/v1/admin/stats  (extended overview)

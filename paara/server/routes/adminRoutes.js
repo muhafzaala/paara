@@ -6,6 +6,7 @@ const {
   getOrders,
   getSellers, verifySeller,
   getAnalytics, getFullStats,
+  getAuditLog, getPlatformStats,
 } = require("../controllers/adminController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
@@ -34,5 +35,9 @@ router.patch("/sellers/:id/verify",    verifySeller);
 
 // Analytics
 router.get("/analytics/overview",      getAnalytics);
+
+// Audit log & platform stats
+router.get("/audit-log",               getAuditLog);
+router.get("/platform-stats",          getPlatformStats);
 
 module.exports = router;

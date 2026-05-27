@@ -164,6 +164,8 @@ export const adminApi = {
   createCoupon: (data: object) => api.post("/coupons", data),
   updateCoupon: (id: string, data: object) => api.patch(`/coupons/${id}`, data),
   deleteCoupon: (id: string) => api.delete(`/coupons/${id}`),
+  getPlatformStats: () => api.get("/admin/platform-stats"),
+  getAuditLog: (params?: object) => api.get("/admin/audit-log", { params }),
   listSellerProfiles: (params?: any) => api.get("/admin/seller-profiles", { params }),
   advanceSellerVerification: (id: string, stage: string, notes?: string) =>
     api.patch(`/admin/seller-profiles/${id}/advance`, { stage, notes }),
@@ -183,6 +185,7 @@ export const sellerApi = {
   requestPayout: (data: object) => api.post("/payouts/request", data),
   updateSettings: (data: object) => api.put("/users/profile", data),
   getPublicProfile: (id: string) => api.get(`/shops/${id}`),
+  getPublicShop: (id: string) => api.get(`/shops/${id}`),
 };
 
 export const messagingApi = {
