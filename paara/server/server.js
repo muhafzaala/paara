@@ -2,6 +2,7 @@ const express        = require("express");
 const cors           = require("cors");
 const morgan         = require("morgan");
 const dotenv         = require("dotenv");
+const compression    = require("compression");
 const helmet         = require("helmet");
 const mongoSanitize  = require("express-mongo-sanitize");
 const xss            = require("xss-clean");
@@ -10,6 +11,7 @@ const cookieParser   = require("cookie-parser");
 const rateLimit      = require("express-rate-limit");
 const connectDB      = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const { cache } = require("./middleware/cache");
 
 dotenv.config();
 connectDB();
@@ -19,18 +21,8 @@ const app = express();
 app.disable("x-powered-by");
 
 // Helmet
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc:   ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      fontSrc:    ["'self'", "fonts.gstatic.com"],
-      imgSrc:     ["'self'", "data:", "res.cloudinary.com"],
-      scriptSrc:  ["'self'"],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
+app.use(compression());
 
 // CORS
 const corsOptions = {
@@ -100,6 +92,11 @@ const deprecationMiddleware = (req, res, next) => {
   res.set("Link", `<http://${host}/api/v1${req.path}>; rel="successor-version"`);
   next();
 };
+
+// ─── Route-level caching ──────────────────────────────────────
+app.use("/api/v1/products/search", cache(120));
+app.use("/api/v1/recommendations", cache(300));
+app.use("/api/v1/cities",          cache(3600));
 
 // ─── v1 Routes (current, supported) ───
 app.use("/api/v1/auth",           require("./routes/authRoutes"));
