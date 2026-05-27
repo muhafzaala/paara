@@ -224,3 +224,48 @@ exports.updateMyProfile = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+// POST /api/v1/seller/profile/submit-application  (seller)
+exports.submitApplication = async (req, res) => {
+  try {
+    let profile = await SellerProfile.findOne({ user: req.user._id });
+    if (!profile) profile = await SellerProfile.create({ user: req.user._id });
+
+    // Require minimum data before submitting
+    const required = ["shopName", "shopDescription", "city"];
+    const missing = required.filter((f) => !profile[f] || String(profile[f]).trim() === "");
+    if (missing.length) {
+      return res.status(400).json({
+        success: false,
+        message: `Please complete: ${missing.join(", ")} before submitting.`,
+        missing,
+      });
+    }
+    if (!profile.documents?.cnicFront || !profile.documents?.cnicBack) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload both sides of your CNIC before submitting.",
+      });
+    }
+
+    // Transition to applied
+    profile.verificationStatus = "applied";
+    profile.verificationStage = 1;
+    profile.appliedAt = new Date();
+    profile.verificationHistory.push({
+      stage: "applied",
+      notes: "Seller submitted onboarding application.",
+      by: req.user._id,
+      at: new Date(),
+    });
+    await profile.save();
+
+    res.json({
+      success: true,
+      message: "Application submitted. Our team will review it within 3-5 business days.",
+      profile,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
