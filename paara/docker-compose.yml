@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  mongo:
+    image: mongo:7
+    volumes: ["mongo-data:/data/db"]
+    ports: ["27017:27017"]
+  server:
+    build: ./server
+    env_file: ./server/.env
+    depends_on: [mongo]
+    environment:
+      MONGO_URI: mongodb://mongo:27017/paara
+    ports: ["5000:5000"]
+  client:
+    build: ./client
+    depends_on: [server]
+    ports: ["80:80"]
+volumes:
+  mongo-data:
