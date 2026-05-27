@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getProducts, getProduct, createProduct, updateProduct, deleteProduct, getMyProducts, askQuestion, answerQuestion } = require("../controllers/productController");
+const { getProducts, getProduct, createProduct, updateProduct, deleteProduct, getMyProducts, askQuestion, answerQuestion, searchProducts } = require("../controllers/productController");
 const { protect, sellerOrAdmin, optionalAuth } = require("../middleware/authMiddleware");
 const { getProductReviews } = require("../controllers/reviewController");
 router.get("/", optionalAuth, getProducts);
+router.get("/search", searchProducts);
 router.get("/seller/my-products", protect, getMyProducts);
 router.get("/:id", optionalAuth, getProduct);
 router.post("/", protect, sellerOrAdmin, createProduct);

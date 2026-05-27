@@ -125,3 +125,44 @@ exports.answerQuestion = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+// GET /api/v1/search  (public)
+exports.searchProducts = async (req, res) => {
+  try {
+    const { q, category, city, region, minPrice, maxPrice, sort = "newest", page = 1, limit = 24 } = req.query;
+    const match = { status: "approved", isActive: true };
+    if (q) match.$or = [
+      { name: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+      { artisan: { $regex: q, $options: "i" } },
+      { category: { $regex: q, $options: "i" } },
+    ];
+    if (category) match.category = category;
+    if (city) match.city = city;
+    if (region) match.region = region;
+    if (minPrice || maxPrice) {
+      match.price = {};
+      if (minPrice) match.price.$gte = Number(minPrice);
+      if (maxPrice) match.price.$lte = Number(maxPrice);
+    }
+    const sortMap = {
+      newest: { createdAt: -1 }, price_low: { price: 1 }, price_high: { price: -1 },
+      rating: { rating: -1 }, popular: { numSold: -1 },
+    };
+    const total = await Product.countDocuments(match);
+    const products = await Product.find(match)
+      .sort(sortMap[sort] || { createdAt: -1 })
+      .skip((Number(page) - 1) * Number(limit))
+      .limit(Number(limit));
+
+    const facets = await Product.aggregate([
+      { $match: { status: "approved", isActive: true } },
+      { $facet: {
+        categories: [{ $group: { _id: "$category", count: { $sum: 1 } } }, { $sort: { count: -1 } }],
+        cities: [{ $group: { _id: "$city", count: { $sum: 1 } } }, { $sort: { count: -1 } }, { $limit: 20 }],
+        regions: [{ $group: { _id: "$region", count: { $sum: 1 } } }],
+      }},
+    ]);
+    res.json({ success: true, products, total, page: Number(page), facets: facets[0] });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};

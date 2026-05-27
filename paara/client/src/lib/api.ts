@@ -50,6 +50,7 @@ export const productsApi = {
   getSellerProducts: () => api.get("/products/seller/my-products"),
   askQuestion: (productId: string, question: string) => api.post(`/products/${productId}/ask-question`, { question }),
   answerQuestion: (productId: string, qid: string, answer: string) => api.patch(`/products/${productId}/questions/${qid}/answer`, { answer }),
+  search: (params: any) => api.get("/products/search", { params }),
 };
 
 export const cartApi = {
