@@ -113,7 +113,7 @@ app.use("/api/v1",                standaloneReviewRouter);
 app.use("/api/v1/admin",          require("./routes/adminRoutes"));
 app.use("/api/v1/wishlist",       require("./routes/wishlistRoutes"));
 app.use("/api/v1/users",          require("./routes/userRoutes"));
-app.use("/api/v1/notifications",  require("./routes/notificationRoutes"));
+app.use("/api/v1",                require("./routes/notificationRoutes"));
 app.use("/api/v1/verification",   require("./routes/verificationRoutes"));
 app.use("/api/v1/upload",         require("./routes/uploadRoutes"));
 app.use("/api/v1/coupons",        require("./routes/couponRoutes"));

@@ -1,11 +1,10 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck, Bell } from "lucide-react";
+import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/paara-logo.png";
 import { useAuth } from "@/lib/auth-store";
-import { useQuery } from "@tanstack/react-query";
-import { notificationsApi } from "@/lib/api";
 import { useCart } from "@/lib/cart-store";
+import { NotificationBell } from "./NotificationBell";
 import { toast } from "sonner";
 
 interface NavProps { variant?: "transparent" | "solid"; }
@@ -93,9 +92,7 @@ export function Nav({ variant = "transparent" }: NavProps) {
           </Link>
 
           {/* Notification Bell */}
-          {user && (
-            <NotificationBell onDark={onDark} />
-          )}
+          {user && <NotificationBell />}
 
           {/* Auth-aware user section */}
           {user ? (
@@ -186,22 +183,4 @@ function IconBtn({ children, onDark, label }: { children: React.ReactNode; onDar
   );
 }
 
-function NotificationBell({ onDark }: { onDark: boolean }) {
-  const { data } = useQuery({
-    queryKey: ["notif-unread"],
-    queryFn: async () => { try { return (await notificationsApi.getAll()).data.unread; } catch { return 0; } },
-    refetchInterval: 30000,
-  });
-  const unread: number = data || 0;
-  return (
-    <div className="hidden sm:block relative">
-      <IconBtn onDark={onDark} label="Notifications"><Bell size={16} /></IconBtn>
-      {unread > 0 && (
-        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold grid place-items-center">
-          {unread > 9 ? "9+" : unread}
-        </span>
-      )}
-    </div>
-  );
-}
 

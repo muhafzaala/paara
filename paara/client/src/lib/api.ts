@@ -106,9 +106,8 @@ export const userApi = {
 };
 
 export const notificationsApi = {
-  getAll: () => api.get("/notifications"),
-  markRead: (id: string) => api.patch(`/notifications/${id}/read`),
-  markAllRead: () => api.patch("/notifications/read-all"),
+  list: () => api.get("/notifications"),
+  markRead: () => api.patch("/notifications/read-all"),
 };
 
 export const searchApi = {

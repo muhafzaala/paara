@@ -1,29 +1,15 @@
 const Notification = require("../models/Notification");
 
-exports.getNotifications = async (req, res) => {
-  try {
-    const notifications = await Notification.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(50);
-    const unread = await Notification.countDocuments({ user: req.user._id, isRead: false });
-    res.json({ success: true, notifications, unread });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+exports.list = async (req, res) => {
+  const items = await Notification.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(50);
+  const unread = await Notification.countDocuments({ user: req.user._id, read: false });
+  res.json({ success: true, notifications: items, unread });
 };
 
 exports.markRead = async (req, res) => {
-  try {
-    await Notification.findOneAndUpdate({ _id: req.params.id, user: req.user._id }, { isRead: true, readAt: new Date() });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+  await Notification.updateMany({ user: req.user._id, read: false }, { read: true });
+  res.json({ success: true });
 };
 
-exports.markAllRead = async (req, res) => {
-  try {
-    await Notification.updateMany({ user: req.user._id, isRead: false }, { isRead: true, readAt: new Date() });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+exports.create = async (user, type, title, message, link, metadata = {}) =>
+  Notification.create({ user, type, title, message, link, metadata });
