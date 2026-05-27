@@ -37,6 +37,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SellerIndexRouteImport } from './routes/seller.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as ShopsIdRouteImport } from './routes/shops.$id'
 import { Route as SellerVerificationStatusRouteImport } from './routes/seller.verification-status'
 import { Route as SellerSettingsRouteImport } from './routes/seller.settings'
 import { Route as SellerProductsRouteImport } from './routes/seller.products'
@@ -197,6 +198,11 @@ const AccountIndexRoute = AccountIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AccountRoute,
 } as any)
+const ShopsIdRoute = ShopsIdRouteImport.update({
+  id: '/shops/$id',
+  path: '/shops/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SellerVerificationStatusRoute =
   SellerVerificationStatusRouteImport.update({
     id: '/verification-status',
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
   '/seller/verification-status': typeof SellerVerificationStatusRoute
+  '/shops/$id': typeof ShopsIdRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
   '/seller/verification-status': typeof SellerVerificationStatusRoute
+  '/shops/$id': typeof ShopsIdRoute
   '/account': typeof AccountIndexRoute
   '/admin': typeof AdminIndexRoute
   '/seller': typeof SellerIndexRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/seller/products': typeof SellerProductsRoute
   '/seller/settings': typeof SellerSettingsRoute
   '/seller/verification-status': typeof SellerVerificationStatusRoute
+  '/shops/$id': typeof ShopsIdRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/seller/': typeof SellerIndexRoute
@@ -485,6 +494,7 @@ export interface FileRouteTypes {
     | '/seller/products'
     | '/seller/settings'
     | '/seller/verification-status'
+    | '/shops/$id'
     | '/account/'
     | '/admin/'
     | '/seller/'
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/seller/products'
     | '/seller/settings'
     | '/seller/verification-status'
+    | '/shops/$id'
     | '/account'
     | '/admin'
     | '/seller'
@@ -580,6 +591,7 @@ export interface FileRouteTypes {
     | '/seller/products'
     | '/seller/settings'
     | '/seller/verification-status'
+    | '/shops/$id'
     | '/account/'
     | '/admin/'
     | '/seller/'
@@ -612,6 +624,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
   WishlistRoute: typeof WishlistRoute
+  ShopsIdRoute: typeof ShopsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -811,6 +824,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/'
       preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof AccountRoute
+    }
+    '/shops/$id': {
+      id: '/shops/$id'
+      path: '/shops/$id'
+      fullPath: '/shops/$id'
+      preLoaderRoute: typeof ShopsIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/seller/verification-status': {
       id: '/seller/verification-status'
@@ -1064,6 +1084,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
   WishlistRoute: WishlistRoute,
+  ShopsIdRoute: ShopsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
