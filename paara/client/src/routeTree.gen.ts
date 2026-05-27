@@ -45,6 +45,7 @@ import { Route as SellerOrdersRouteImport } from './routes/seller.orders'
 import { Route as SellerOnboardingRouteImport } from './routes/seller.onboarding'
 import { Route as SellerAnalyticsRouteImport } from './routes/seller.analytics'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
+import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSellersRouteImport } from './routes/admin.sellers'
@@ -237,6 +238,11 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ProductsRoute,
 } as any)
+const AdminVerificationsRoute = AdminVerificationsRouteImport.update({
+  id: '/verifications',
+  path: '/verifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -323,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
@@ -368,6 +375,7 @@ export interface FileRoutesByTo {
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
@@ -417,6 +425,7 @@ export interface FileRoutesById {
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
@@ -467,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin/sellers'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verifications'
     | '/products/$id'
     | '/seller/analytics'
     | '/seller/onboarding'
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin/sellers'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verifications'
     | '/products/$id'
     | '/seller/analytics'
     | '/seller/onboarding'
@@ -560,6 +571,7 @@ export interface FileRouteTypes {
     | '/admin/sellers'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verifications'
     | '/products/$id'
     | '/seller/analytics'
     | '/seller/onboarding'
@@ -856,6 +868,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof ProductsRoute
     }
+    '/admin/verifications': {
+      id: '/admin/verifications'
+      path: '/verifications'
+      fullPath: '/admin/verifications'
+      preLoaderRoute: typeof AdminVerificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -966,6 +985,7 @@ interface AdminRouteChildren {
   AdminSellersRoute: typeof AdminSellersRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -975,6 +995,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSellersRoute: AdminSellersRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

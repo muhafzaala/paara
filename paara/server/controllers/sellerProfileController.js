@@ -269,3 +269,47 @@ exports.submitApplication = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// PATCH /api/v1/admin/seller-profiles/:id/advance
+exports.advanceVerification = async (req, res) => {
+  try {
+    const { stage, notes } = req.body;
+    const VALID = ["applied", "documents_under_review", "field_visit_scheduled", "approved", "rejected"];
+    if (!VALID.includes(stage)) return res.status(400).json({ success: false, message: "Invalid stage" });
+
+    const profile = await SellerProfile.findById(req.params.id);
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
+
+    const STAGE_IDX = { applied: 1, documents_under_review: 2, field_visit_scheduled: 3, approved: 4, rejected: 0 };
+    profile.verificationStatus = stage;
+    profile.verificationStage = STAGE_IDX[stage];
+    if (stage === "approved") {
+      profile.approvedAt = new Date();
+      if (!profile.heritageBadges.includes("authentic")) profile.heritageBadges.push("authentic");
+    }
+    if (stage === "rejected") {
+      profile.rejectedAt = new Date();
+      profile.rejectionReason = notes || "Not specified";
+    }
+    profile.verificationHistory.push({ stage, notes: notes || "", by: req.user._id, at: new Date() });
+    await profile.save();
+    res.json({ success: true, profile });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+// PATCH /api/v1/admin/seller-profiles/:id/badges
+exports.awardBadge = async (req, res) => {
+  try {
+    const { badge, action } = req.body; // action: "add" | "remove"
+    const VALID = ["authentic", "master_artisan", "heritage_keeper", "top_rated", "community_favorite"];
+    if (!VALID.includes(badge)) return res.status(400).json({ success: false, message: "Invalid badge" });
+
+    const profile = await SellerProfile.findById(req.params.id);
+    if (!profile) return res.status(404).json({ success: false, message: "Not found" });
+
+    if (action === "add" && !profile.heritageBadges.includes(badge)) profile.heritageBadges.push(badge);
+    if (action === "remove") profile.heritageBadges = profile.heritageBadges.filter(b => b !== badge);
+    await profile.save();
+    res.json({ success: true, profile });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};

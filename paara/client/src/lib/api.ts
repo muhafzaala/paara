@@ -164,6 +164,11 @@ export const adminApi = {
   createCoupon: (data: object) => api.post("/coupons", data),
   updateCoupon: (id: string, data: object) => api.patch(`/coupons/${id}`, data),
   deleteCoupon: (id: string) => api.delete(`/coupons/${id}`),
+  listSellerProfiles: (params?: any) => api.get("/admin/seller-profiles", { params }),
+  advanceSellerVerification: (id: string, stage: string, notes?: string) =>
+    api.patch(`/admin/seller-profiles/${id}/advance`, { stage, notes }),
+  awardBadge: (id: string, badge: string, action: "add" | "remove") =>
+    api.patch(`/admin/seller-profiles/${id}/badges`, { badge, action }),
 };
 
 export const sellerApi = {
