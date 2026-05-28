@@ -55,6 +55,7 @@ import { Route as AdminSellersRouteImport } from './routes/admin.sellers'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminAuditLogRouteImport } from './routes/admin.audit-log'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
 import { Route as AccountSettingsRouteImport } from './routes/account.settings'
 import { Route as AccountRequestAdminRouteImport } from './routes/account.request-admin'
@@ -293,6 +294,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminsRoute = AdminAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountWishlistRoute = AccountWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
@@ -355,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit-log': typeof AdminAuditLogRoute
   '/admin/products': typeof AdminProductsRoute
@@ -406,6 +413,7 @@ export interface FileRoutesByTo {
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit-log': typeof AdminAuditLogRoute
   '/admin/products': typeof AdminProductsRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit-log': typeof AdminAuditLogRoute
   '/admin/products': typeof AdminProductsRoute
@@ -517,6 +526,7 @@ export interface FileRouteTypes {
     | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
+    | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/products'
@@ -568,6 +578,7 @@ export interface FileRouteTypes {
     | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
+    | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/products'
@@ -622,6 +633,7 @@ export interface FileRouteTypes {
     | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
+    | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/products'
@@ -999,6 +1011,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/admins': {
+      id: '/admin/admins'
+      path: '/admins'
+      fullPath: '/admin/admins'
+      preLoaderRoute: typeof AdminAdminsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/wishlist': {
       id: '/account/wishlist'
       path: '/wishlist'
@@ -1078,6 +1097,7 @@ const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
+  AdminAdminsRoute: typeof AdminAdminsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuditLogRoute: typeof AdminAuditLogRoute
   AdminProductsRoute: typeof AdminProductsRoute
@@ -1089,6 +1109,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminsRoute: AdminAdminsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuditLogRoute: AdminAuditLogRoute,
   AdminProductsRoute: AdminProductsRoute,
