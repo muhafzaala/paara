@@ -34,6 +34,14 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 
   isActive: { type: Boolean, default: true },
+
+  // Admin governance
+  isPrimaryAdmin: { type: Boolean, default: false, index: true },
+  adminStatus: { type: String, enum: ["active", "suspended", "pending"], default: "active" },
+  adminPermissions: [{ type: String }],
+  adminApprovedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  adminApprovedAt: Date,
+  twoFactorRequired: { type: Boolean, default: false },
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {
