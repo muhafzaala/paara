@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Users, Package, ShoppingBag, TrendingUp, Award, FileSearch, Loader2 } from "lucide-react";
+import { Users, Package, ShoppingBag, TrendingUp, Award, FileSearch, Loader2, Crown } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { adminApi } from "@/lib/api";
@@ -58,6 +58,11 @@ function AdminDashboard() {
               <Users size={24} className="text-[#C9921A] mb-3" />
               <p className="font-display font-semibold text-[#1C3A2A]">Audit Log</p>
               <p className="text-xs text-[#6B645A] mt-1">Platform activity trail</p>
+            </Link>
+            <Link to="/admin/admins" className="bg-white rounded-2xl p-6 border border-[rgba(201,146,26,0.3)] hover:shadow-lg transition-shadow">
+              <Crown size={24} className="text-[#C9921A] mb-3" />
+              <p className="font-display font-semibold text-[#1C3A2A]">Admin Management</p>
+              <p className="text-xs text-[#6B645A] mt-1">Requests, admins, activity (primary only)</p>
             </Link>
           </div>
 

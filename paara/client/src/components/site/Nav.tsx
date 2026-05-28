@@ -1,10 +1,10 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
+import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
-import logo from "@/assets/paara-logo.png";
 import { useAuth } from "@/lib/auth-store";
 import { useCart } from "@/lib/cart-store";
 import { NotificationBell } from "./NotificationBell";
+import { PaaraLogo } from "./PaaraLogo";
 import { toast } from "sonner";
 
 interface NavProps { variant?: "transparent" | "solid"; }
@@ -12,6 +12,7 @@ interface NavProps { variant?: "transparent" | "solid"; }
 export function Nav({ variant = "transparent" }: NavProps) {
   const [scrolled, setScrolled] = useState(variant === "solid");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, logout } = useAuth();
   const cartItems = useCart((s) => s.items);
@@ -55,8 +56,9 @@ export function Nav({ variant = "transparent" }: NavProps) {
     >
       <div className="mx-auto max-w-[1400px] flex items-center justify-between px-6 lg:px-12 py-4">
         <Link to="/" className="flex items-center group" aria-label="PAARA">
-          <img src={logo} alt="PAARA" className="h-20 md:h-24 lg:h-28 w-auto object-contain transition-transform duration-500 group-hover:scale-[1.04]"
-            style={{ filter: onDark ? "drop-shadow(0 6px 24px rgba(0,0,0,0.55)) brightness(1.05)" : "drop-shadow(0 4px 12px rgba(28,58,42,0.18))" }} />
+          <div className="transition-transform duration-500 group-hover:scale-[1.04]">
+            <PaaraLogo height={72} />
+          </div>
         </Link>
 
         <nav className="hidden lg:flex gap-10">
@@ -64,11 +66,14 @@ export function Nav({ variant = "transparent" }: NavProps) {
             const active = pathname.startsWith(l.to);
             return (
               <Link key={l.to} to={l.to}
-                className="relative text-xs font-semibold uppercase tracking-[0.16em] transition-colors duration-300"
-                style={{ color: active ? "#C9921A" : onDark ? "rgba(245,237,216,0.92)" : "#1C3A2A" }}>
+                className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-300"
+                style={{
+                  color: active ? "#F5EDD8" : "#1C3A2A",
+                  background: active ? "#1C3A2A" : "rgba(255,255,255,0.75)",
+                  border: `1.5px solid ${active ? "#C9921A" : "rgba(28,58,42,0.35)"}`,
+                  backdropFilter: "blur(8px)",
+                }}>
                 {l.label}
-                <span className="absolute left-0 right-0 -bottom-1.5 h-[2px] origin-center transition-transform duration-500"
-                  style={{ background: "#C9921A", transform: active ? "scaleX(1)" : "scaleX(0)" }} />
               </Link>
             );
           })}
@@ -107,13 +112,30 @@ export function Nav({ variant = "transparent" }: NavProps) {
                   <IconBtn onDark={onDark} label="Dashboard"><LayoutDashboard size={16} /></IconBtn>
                 </Link>
               )}
-              <Link to="/account">
-                <button aria-label={user.name}
+              <div className="relative">
+                <button onClick={() => setAvatarOpen((o) => !o)} aria-label={user.name}
                   className="w-10 h-10 rounded-full grid place-items-center text-xs font-bold transition-all duration-300 hover:-translate-y-0.5"
                   style={{ background: "#C9921A", color: "#1C3A2A", border: "2px solid rgba(201,146,26,0.4)" }}>
                   {initials}
                 </button>
-              </Link>
+                {avatarOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setAvatarOpen(false)} />
+                    <div className="absolute right-0 top-12 z-50 w-52 bg-white rounded-2xl shadow-xl border border-[rgba(28,58,42,0.1)] overflow-hidden py-1">
+                      <Link to="/account" onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#1C3A2A] hover:bg-[#FFF8EC]">
+                        <User size={14} /> My Account
+                      </Link>
+                      {user.role !== "admin" && (
+                        <Link to="/account/request-admin" onClick={() => setAvatarOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#1C3A2A] hover:bg-[#FFF8EC]">
+                          <Crown size={14} className="text-[#C9921A]" /> Request admin access
+                        </Link>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
               <button onClick={handleLogout} aria-label="Sign out"
                 className="w-10 h-10 rounded-full grid place-items-center transition-all duration-300 hover:-translate-y-0.5"
                 style={{ border: `1.5px solid ${onDark ? "rgba(245,237,216,0.3)" : "rgba(28,58,42,0.15)"}`, color: onDark ? "#F5EDD8" : "#1C3A2A", background: onDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.6)" }}>
@@ -135,7 +157,7 @@ export function Nav({ variant = "transparent" }: NavProps) {
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] bg-[#1C3A2A] text-[#F5EDD8] flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(201,146,26,0.2)]">
-            <img src={logo} alt="PAARA" className="h-16 w-auto object-contain" />
+            <PaaraLogo height={64} />
             <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="p-2"><X size={22} /></button>
           </div>
           <nav className="flex flex-col p-8 gap-6 overflow-y-auto">
@@ -153,6 +175,11 @@ export function Nav({ variant = "transparent" }: NavProps) {
                 <Link to="/account" onClick={() => setMobileOpen(false)} className="font-display text-2xl">My Account</Link>
                 {user.role === "seller" && <Link to="/seller" onClick={() => setMobileOpen(false)} className="font-display text-2xl">Seller Dashboard</Link>}
                 {user.role === "admin" && <Link to="/admin" onClick={() => setMobileOpen(false)} className="font-display text-2xl">Admin</Link>}
+                {user.role !== "admin" && (
+                  <Link to="/account/request-admin" onClick={() => setMobileOpen(false)} className="font-display text-2xl flex items-center gap-3">
+                    <Crown size={20} className="text-[#C9921A]" /> Request admin access
+                  </Link>
+                )}
                 <button onClick={handleLogout} className="font-display text-2xl text-left text-[rgba(245,237,216,0.7)]">Sign out</button>
               </>
             ) : (
