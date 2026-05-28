@@ -44,8 +44,10 @@ import { Route as SellerProductsRouteImport } from './routes/seller.products'
 import { Route as SellerPayoutsRouteImport } from './routes/seller.payouts'
 import { Route as SellerOrdersRouteImport } from './routes/seller.orders'
 import { Route as SellerOnboardingRouteImport } from './routes/seller.onboarding'
+import { Route as SellerHeritageRouteImport } from './routes/seller.heritage'
 import { Route as SellerAnalyticsRouteImport } from './routes/seller.analytics'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
+import { Route as HeritageIdRouteImport } from './routes/heritage.$id'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -55,6 +57,7 @@ import { Route as AdminAuditLogRouteImport } from './routes/admin.audit-log'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
 import { Route as AccountSettingsRouteImport } from './routes/account.settings'
+import { Route as AccountRequestAdminRouteImport } from './routes/account.request-admin'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountAddressesRouteImport } from './routes/account.addresses'
 import { Route as AccountOrdersIdRouteImport } from './routes/account.orders.$id'
@@ -235,6 +238,11 @@ const SellerOnboardingRoute = SellerOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => SellerRoute,
 } as any)
+const SellerHeritageRoute = SellerHeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
+  getParentRoute: () => SellerRoute,
+} as any)
 const SellerAnalyticsRoute = SellerAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -244,6 +252,11 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ProductsRoute,
+} as any)
+const HeritageIdRoute = HeritageIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => HeritageRoute,
 } as any)
 const AdminVerificationsRoute = AdminVerificationsRouteImport.update({
   id: '/verifications',
@@ -290,6 +303,11 @@ const AccountSettingsRoute = AccountSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountRequestAdminRoute = AccountRequestAdminRouteImport.update({
+  id: '/request-admin',
+  path: '/request-admin',
+  getParentRoute: () => AccountRoute,
+} as any)
 const AccountOrdersRoute = AccountOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -317,7 +335,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/heritage': typeof HeritageRoute
+  '/heritage': typeof HeritageRouteWithChildren
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
@@ -334,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -343,8 +362,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/heritage/$id': typeof HeritageIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/heritage': typeof SellerHeritageRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
@@ -366,7 +387,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/heritage': typeof HeritageRoute
+  '/heritage': typeof HeritageRouteWithChildren
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
@@ -382,6 +403,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -391,8 +413,10 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/heritage/$id': typeof HeritageIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/heritage': typeof SellerHeritageRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
@@ -417,7 +441,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/heritage': typeof HeritageRoute
+  '/heritage': typeof HeritageRouteWithChildren
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
@@ -434,6 +458,7 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -443,8 +468,10 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/heritage/$id': typeof HeritageIdRoute
   '/products/$id': typeof ProductsIdRoute
   '/seller/analytics': typeof SellerAnalyticsRoute
+  '/seller/heritage': typeof SellerHeritageRoute
   '/seller/onboarding': typeof SellerOnboardingRoute
   '/seller/orders': typeof SellerOrdersRoute
   '/seller/payouts': typeof SellerPayoutsRoute
@@ -487,6 +514,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
     | '/admin/analytics'
@@ -496,8 +524,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verifications'
+    | '/heritage/$id'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/heritage'
     | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
@@ -535,6 +565,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
     | '/admin/analytics'
@@ -544,8 +575,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verifications'
+    | '/heritage/$id'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/heritage'
     | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
@@ -586,6 +619,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/request-admin'
     | '/account/settings'
     | '/account/wishlist'
     | '/admin/analytics'
@@ -595,8 +629,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/verifications'
+    | '/heritage/$id'
     | '/products/$id'
     | '/seller/analytics'
+    | '/seller/heritage'
     | '/seller/onboarding'
     | '/seller/orders'
     | '/seller/payouts'
@@ -621,7 +657,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
-  HeritageRoute: typeof HeritageRoute
+  HeritageRoute: typeof HeritageRouteWithChildren
   LoginRoute: typeof LoginRoute
   PressRoute: typeof PressRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -886,6 +922,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerOnboardingRouteImport
       parentRoute: typeof SellerRoute
     }
+    '/seller/heritage': {
+      id: '/seller/heritage'
+      path: '/heritage'
+      fullPath: '/seller/heritage'
+      preLoaderRoute: typeof SellerHeritageRouteImport
+      parentRoute: typeof SellerRoute
+    }
     '/seller/analytics': {
       id: '/seller/analytics'
       path: '/analytics'
@@ -899,6 +942,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/products/$id'
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof ProductsRoute
+    }
+    '/heritage/$id': {
+      id: '/heritage/$id'
+      path: '/$id'
+      fullPath: '/heritage/$id'
+      preLoaderRoute: typeof HeritageIdRouteImport
+      parentRoute: typeof HeritageRoute
     }
     '/admin/verifications': {
       id: '/admin/verifications'
@@ -963,6 +1013,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountSettingsRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/request-admin': {
+      id: '/account/request-admin'
+      path: '/request-admin'
+      fullPath: '/account/request-admin'
+      preLoaderRoute: typeof AccountRequestAdminRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/account/orders': {
       id: '/account/orders'
       path: '/orders'
@@ -1002,6 +1059,7 @@ const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
 interface AccountRouteChildren {
   AccountAddressesRoute: typeof AccountAddressesRoute
   AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
+  AccountRequestAdminRoute: typeof AccountRequestAdminRoute
   AccountSettingsRoute: typeof AccountSettingsRoute
   AccountWishlistRoute: typeof AccountWishlistRoute
   AccountIndexRoute: typeof AccountIndexRoute
@@ -1010,6 +1068,7 @@ interface AccountRouteChildren {
 const AccountRouteChildren: AccountRouteChildren = {
   AccountAddressesRoute: AccountAddressesRoute,
   AccountOrdersRoute: AccountOrdersRouteWithChildren,
+  AccountRequestAdminRoute: AccountRequestAdminRoute,
   AccountSettingsRoute: AccountSettingsRoute,
   AccountWishlistRoute: AccountWishlistRoute,
   AccountIndexRoute: AccountIndexRoute,
@@ -1042,6 +1101,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface HeritageRouteChildren {
+  HeritageIdRoute: typeof HeritageIdRoute
+}
+
+const HeritageRouteChildren: HeritageRouteChildren = {
+  HeritageIdRoute: HeritageIdRoute,
+}
+
+const HeritageRouteWithChildren = HeritageRoute._addFileChildren(
+  HeritageRouteChildren,
+)
+
 interface ProductsRouteChildren {
   ProductsIdRoute: typeof ProductsIdRoute
 }
@@ -1056,6 +1127,7 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 
 interface SellerRouteChildren {
   SellerAnalyticsRoute: typeof SellerAnalyticsRoute
+  SellerHeritageRoute: typeof SellerHeritageRoute
   SellerOnboardingRoute: typeof SellerOnboardingRoute
   SellerOrdersRoute: typeof SellerOrdersRoute
   SellerPayoutsRoute: typeof SellerPayoutsRoute
@@ -1067,6 +1139,7 @@ interface SellerRouteChildren {
 
 const SellerRouteChildren: SellerRouteChildren = {
   SellerAnalyticsRoute: SellerAnalyticsRoute,
+  SellerHeritageRoute: SellerHeritageRoute,
   SellerOnboardingRoute: SellerOnboardingRoute,
   SellerOrdersRoute: SellerOrdersRoute,
   SellerPayoutsRoute: SellerPayoutsRoute,
@@ -1090,7 +1163,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
-  HeritageRoute: HeritageRoute,
+  HeritageRoute: HeritageRouteWithChildren,
   LoginRoute: LoginRoute,
   PressRoute: PressRoute,
   PrivacyRoute: PrivacyRoute,
