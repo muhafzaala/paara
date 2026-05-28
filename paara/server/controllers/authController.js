@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const SellerProfile = require("../models/SellerProfile");
 
@@ -107,20 +108,89 @@ exports.resendEmailOtp = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ success: false, message: "Please provide email and password" });
-
     const user = await User.findOne({ email }).select("+password");
-    if (!user || !(await user.matchPassword(password)))
+    if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ success: false, message: "Invalid email or password" });
+    if (!user.isActive) return res.status(403).json({ success: false, message: "Account deactivated" });
 
-    if (!user.isActive)
-      return res.status(403).json({ success: false, message: "Account deactivated. Contact support." });
+    // Admin: require 2FA
+    if (user.role === "admin") {
+      if (user.adminStatus !== "active")
+        return res.status(403).json({ success: false, message: `Admin ${user.adminStatus}` });
+      const { createOTP } = require("../utils/otp");
+      await createOTP(user._id, "admin_2fa", "console", req.ip);
+      const challengeToken = jwt.sign(
+        { sub: user._id, stage: "admin_2fa" },
+        process.env.JWT_SECRET, { expiresIn: "10m" }
+      );
+      return res.json({ success: true, twoFactor: true, challengeToken, message: "OTP sent" });
+    }
 
-    sendToken(user, 200, res);
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+    const token = jwt.sign(
+      { sub: user._id, role: user.role },
+      process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
+    res.json({
+      success: true,
+      token,
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+    });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+// POST /api/v1/auth/verify-2fa
+exports.verify2FA = async (req, res) => {
+  try {
+    const { challengeToken, code } = req.body;
+    const decoded = jwt.verify(challengeToken, process.env.JWT_SECRET);
+    if (decoded.stage !== "admin_2fa") return res.status(400).json({ success: false, message: "Invalid challenge" });
+    const { verifyOTP } = require("../utils/otp");
+    await verifyOTP(decoded.sub, "admin_2fa", code);
+    const user = await User.findById(decoded.sub);
+    if (!user || user.role !== "admin" || user.adminStatus !== "active")
+      return res.status(403).json({ success: false, message: "Not allowed" });
+    const token = jwt.sign(
+      { sub: user._id, role: user.role, twoFA: true },
+      process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
+    res.json({
+      success: true, token,
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, isPrimaryAdmin: user.isPrimaryAdmin },
+    });
+  } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
+};
+
+// POST /api/v1/auth/resend-otp
+exports.resendOTP = async (req, res) => {
+  try {
+    const { challengeToken, purpose = "admin_2fa" } = req.body;
+    const decoded = jwt.verify(challengeToken, process.env.JWT_SECRET);
+    const { createOTP } = require("../utils/otp");
+    await createOTP(decoded.sub, purpose, "console", req.ip);
+    res.json({ success: true, message: "Code resent" });
+  } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
+};
+
+// POST /api/v1/auth/request-otp  (authenticated)
+exports.requestOTP = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ success: false, message: "Not authenticated" });
+    const { purpose = "email_verify", channel = "console" } = req.body;
+    const { createOTP } = require("../utils/otp");
+    await createOTP(req.user._id, purpose, channel, req.ip);
+    res.json({ success: true, message: "Code sent" });
+  } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
+};
+
+// POST /api/v1/auth/verify-otp  (authenticated)
+exports.verifyGenericOTP = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ success: false, message: "Not authenticated" });
+    const { code, purpose } = req.body;
+    const { verifyOTP } = require("../utils/otp");
+    await verifyOTP(req.user._id, purpose, code);
+    res.json({ success: true });
+  } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
 };
 
 // GET /api/v1/auth/me
