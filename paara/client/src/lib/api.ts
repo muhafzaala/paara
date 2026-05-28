@@ -39,6 +39,12 @@ export const authApi = {
   setup2FA: () => api.post("/auth/2fa/setup"),
   verify2FA: (token: string) => api.post("/auth/2fa/verify", { token }),
   disable2FA: (password: string) => api.post("/auth/2fa/disable", { password }),
+  // Admin 2FA challenge (unauthenticated, uses challengeToken)
+  verifyAdmin2FA: (challengeToken: string, code: string) => api.post("/auth/verify-2fa", { challengeToken, code }),
+  resendOTP: (challengeToken: string, purpose?: string) => api.post("/auth/resend-otp", { challengeToken, purpose }),
+  // Authenticated OTP (email verify, etc.)
+  requestOTP: (purpose: string, channel: string = "console") => api.post("/auth/otp/request", { purpose, channel }),
+  verifyOTP: (purpose: string, code: string) => api.post("/auth/otp/verify", { purpose, code }),
 };
 
 export const productsApi = {
@@ -108,6 +114,15 @@ export const userApi = {
 export const notificationsApi = {
   list: () => api.get("/notifications"),
   markRead: () => api.patch("/notifications/read-all"),
+};
+
+export const heritageApi = {
+  list: (params?: object) => api.get("/heritage", { params }),
+  getOne: (id: string) => api.get(`/heritage/${id}`),
+  getMine: () => api.get("/heritage/mine"),
+  create: (data: object) => api.post("/heritage", data),
+  update: (id: string, data: object) => api.put(`/heritage/${id}`, data),
+  remove: (id: string) => api.delete(`/heritage/${id}`),
 };
 
 export const searchApi = {
@@ -193,6 +208,19 @@ export const messagingApi = {
   getMessages: (conversationId: string) => api.get(`/messages/${conversationId}`),
   send: (receiverId: string, text: string, productId?: string) => api.post("/messages", { receiverId, text, productId }),
   getUnreadCount: () => api.get("/messages/unread-count"),
+};
+
+export const adminMgmtApi = {
+  submitRequest: (reason: string) => api.post("/admin-requests", { reason }),
+  myRequest: () => api.get("/admin-requests/mine"),
+  listRequests: (status: string = "pending") => api.get("/admin/admin-requests", { params: { status } }),
+  reviewRequest: (id: string, action: "approve" | "reject", notes?: string) =>
+    api.patch(`/admin/admin-requests/${id}/review`, { action, notes }),
+  listAdmins: (params?: any) => api.get("/admin/admins", { params }),
+  updateAdminStatus: (id: string, status: "active" | "suspended") =>
+    api.patch(`/admin/admins/${id}/status`, { status }),
+  removeAdmin: (id: string) => api.delete(`/admin/admins/${id}`),
+  adminActivity: () => api.get("/admin/admin-activity"),
 };
 
 export default api;
