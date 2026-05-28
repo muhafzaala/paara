@@ -112,6 +112,7 @@ app.use("/api/v1",                standaloneReviewRouter);
 
 app.use("/api/v1/admin",          require("./routes/adminRoutes"));
 app.use("/api/v1/wishlist",       require("./routes/wishlistRoutes"));
+app.use("/api/v1/heritage",      require("./routes/heritageRoutes"));
 app.use("/api/v1/users",          require("./routes/userRoutes"));
 app.use("/api/v1",                require("./routes/notificationRoutes"));
 app.use("/api/v1/verification",   require("./routes/verificationRoutes"));
@@ -132,6 +133,7 @@ app.use("/api/v1",                require("./routes/searchRoutes"));
 app.use("/api/v1",                require("./routes/cityRoutes"));
 app.use("/api/v1",                require("./routes/collectionRoutes"));
 app.use("/api/v1",                require("./routes/recommendationsRoutes"));
+app.use("/api/v1",                require("./routes/adminMgmtRoutes"));
 
 // ─── Deprecated /api/ Aliases (backward compat, 6 months) ───
 // Every alias is wrapped in deprecationMiddleware so old clients receive
