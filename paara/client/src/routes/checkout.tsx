@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Check, ArrowRight, ArrowLeft, Wallet, Smartphone, Banknote, Truck, ShieldCheck, Loader2, CreditCard } from "lucide-react";
+import RegionalCelebration from "@/components/celebrations/RegionalCelebration";
+import { Check, ArrowRight, ArrowLeft, Wallet, Smartphone, Banknote, Truck, ShieldCheck, Loader2, CreditCard, Package } from "lucide-react";
+import { motion } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/lib/cart-store";
@@ -29,6 +31,9 @@ function CheckoutPage() {
   const [payment, setPayment] = useState<"jazzcash" | "easypaisa" | "card" | "bank" | "cod">("cod");
   const [orderId, setOrderId] = useState("");
   const [placing, setPlacing] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [celebRegion, setCelebRegion] = useState<string | undefined>(undefined);
+  const [celebCity, setCelebCity] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!user) navigate({ to: "/login" });
@@ -43,7 +48,7 @@ function CheckoutPage() {
       <main className="flex-1 grid place-items-center px-6">
         <div className="text-center">
           <h1 className="display-serif text-4xl text-[#1C3A2A] mb-4">Your cart is empty</h1>
-          <Link to="/products" className="btn btn-primary">Explore the catalogue</Link>
+          <Link to="/products" search={{} as any} className="btn btn-primary">Explore the catalogue</Link>
         </div>
       </main>
       <Footer />
@@ -51,6 +56,7 @@ function CheckoutPage() {
   );
 
   const placeOrder = async () => {
+    const itemsSnapshot = items; // capture before clear()
     setPlacing(true);
     try {
       if (user) {
@@ -66,6 +72,19 @@ function CheckoutPage() {
       setStep(2);
       clear();
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // Determine dominant region/city for celebration overlay
+      const regionCounts: Record<string, number> = {};
+      const cityCounts: Record<string, number> = {};
+      for (const it of itemsSnapshot) {
+        const r = (it.product as any).region; if (r) regionCounts[r] = (regionCounts[r] || 0) + 1;
+        const c = (it.product as any).city;   if (c) cityCounts[c]   = (cityCounts[c]   || 0) + 1;
+      }
+      const dominantRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+      const dominantCity   = Object.entries(cityCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+      setCelebRegion(dominantRegion);
+      setCelebCity(dominantCity);
+      setCelebrating(true);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Could not place order. Please try again.");
     } finally {
@@ -124,6 +143,12 @@ function CheckoutPage() {
         </div>
       </div>
       <Footer />
+      <RegionalCelebration
+        show={celebrating}
+        region={celebRegion}
+        city={celebCity}
+        onClose={() => setCelebrating(false)}
+      />
     </div>
   );
 }
@@ -236,27 +261,73 @@ function Field({ label, value, onChange, placeholder }: any) {
 function Confirmation({ orderId, navigate }: any) {
   return (
     <div className="text-center max-w-2xl mx-auto py-16">
-      <div className="w-20 h-20 rounded-full bg-[#C9921A] grid place-items-center mx-auto mb-8 shadow-[0_8px_32px_rgba(201,146,26,0.4)]">
-        <Check size={32} className="text-[#1C3A2A]" strokeWidth={2.5} />
-      </div>
-      <p className="urdu text-[#C9921A] text-2xl mb-4">شکریہ · آپ کا آرڈر مل گیا</p>
-      <p className="eyebrow mb-3">Order placed</p>
-      <h1 className="display-serif text-4xl md:text-5xl text-[#1C3A2A] mb-4 leading-[1.1]">
-        Thank you — your <em className="italic text-[#C9921A]">heritage</em> is on its way.
-      </h1>
-      <p className="text-[#3D2914] mb-8 leading-relaxed max-w-lg mx-auto">
-        We have notified the artisan. You will receive an email once your piece is packed and dispatched.
-      </p>
-      <div className="bg-white rounded-[20px] p-6 md:p-8 inline-block min-w-[320px] mb-8 shadow-[var(--shadow-soft)] border border-[rgba(28,58,42,0.08)]">
-        <p className="text-xs uppercase tracking-[0.16em] text-[#6B645A] mb-1">Order ID</p>
-        <p className="font-display text-2xl text-[#1C3A2A] font-semibold mb-4">{orderId}</p>
-        <p className="text-xs uppercase tracking-[0.16em] text-[#6B645A] mb-1">Expected delivery</p>
-        <p className="text-sm text-[#1C3A2A]">3–5 business days · within Pakistan</p>
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <button onClick={() => navigate({ to: "/" })} className="btn btn-outline-forest">Back to home</button>
-        <button onClick={() => navigate({ to: "/account/orders" })} className="btn btn-primary">View my orders</button>
-      </div>
+      {/* Animated success checkmark */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="w-24 h-24 rounded-full mx-auto mb-8 grid place-items-center shadow-[0_8px_40px_rgba(201,146,26,0.45)]"
+        style={{ background: "linear-gradient(135deg, #C9921A 0%, #1C3A2A 100%)" }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.25, type: "spring", stiffness: 300 }}
+        >
+          <Check size={38} className="text-[#F5EDD8]" strokeWidth={2.5} />
+        </motion.div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.4 }}
+      >
+        <p className="urdu text-[#C9921A] text-2xl mb-4">شکریہ · آپ کا آرڈر مل گیا</p>
+        <p className="eyebrow mb-3">Order placed successfully</p>
+        <h1 className="display-serif text-4xl md:text-5xl text-[#1C3A2A] mb-4 leading-[1.1]">
+          Thank you — your <em className="italic text-[#C9921A]">heritage</em> is on its way.
+        </h1>
+        <p className="text-[#3D2914] mb-8 leading-relaxed max-w-lg mx-auto">
+          We have notified the artisan. You will receive an email once your piece is packed and dispatched.
+        </p>
+
+        {/* Order summary card */}
+        <div className="bg-white rounded-[20px] p-6 md:p-8 inline-block min-w-[320px] mb-8 shadow-[var(--shadow-soft)] border border-[rgba(28,58,42,0.08)] text-left">
+          <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[rgba(28,58,42,0.08)]">
+            <div className="w-10 h-10 rounded-full bg-[#FFF8EC] grid place-items-center">
+              <Package size={18} className="text-[#C9921A]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-[#6B645A]">Order ID</p>
+              <p className="font-display text-lg text-[#1C3A2A] font-semibold">{orderId}</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Truck size={14} className="text-[#C9921A] flex-shrink-0" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#6B645A]">Estimated delivery</p>
+                <p className="text-sm font-medium text-[#1C3A2A]">Arrives in 3–5 business days</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={14} className="text-[#C9921A] flex-shrink-0" />
+              <p className="text-xs text-[#6B645A]">Authenticity guaranteed · insured shipping</p>
+            </div>
+          </div>
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link to="/account/orders" className="btn btn-primary">
+            Track order <ArrowRight size={16} />
+          </Link>
+          <Link to="/products" search={{} as any} className="btn btn-outline-forest">
+            Continue shopping
+          </Link>
+        </div>
+      </motion.div>
     </div>
   );
 }
