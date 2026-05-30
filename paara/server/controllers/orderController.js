@@ -172,3 +172,21 @@ exports.getSellerOrders = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// GET /api/v1/orders/passport  (buyer — heritage passport data)
+exports.getPassportData = async (req, res) => {
+  try {
+    const data = await Order.aggregate([
+      { $match: { buyer: req.user._id } },
+      { $unwind: "$items" },
+      { $lookup: { from: "products", localField: "items.product", foreignField: "_id", as: "prod" } },
+      { $unwind: "$prod" },
+      { $match: { "prod.region": { $exists: true, $ne: "" } } },
+      { $group: { _id: "$prod.region", count: { $sum: "$items.quantity" }, firstAt: { $min: "$createdAt" }, lastAt: { $max: "$createdAt" }, cities: { $addToSet: "$prod.city" }, products: { $addToSet: "$prod.name" } } },
+      { $sort: { firstAt: 1 } },
+    ]);
+    const totalRegions = data.length;
+    const totalCrafts = data.reduce((a, r) => a + r.count, 0);
+    res.json({ success: true, stamps: data, totalRegions, totalCrafts });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};

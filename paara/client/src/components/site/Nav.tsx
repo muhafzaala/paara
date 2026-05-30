@@ -1,11 +1,16 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck, Crown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LayoutDashboard, ShieldCheck, Crown, Map } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-store";
 import { useCart } from "@/lib/cart-store";
 import { NotificationBell } from "./NotificationBell";
 import { PaaraLogo } from "./PaaraLogo";
 import { toast } from "sonner";
+import { SearchTypeahead } from "./SearchTypeahead";
+import { LanguageToggle } from "./LanguageToggle";
+import { useLang } from "@/lib/i18n";
+import VoiceSearchButton from "./VoiceSearchButton";
+import CurrencySwitcher from "./CurrencySwitcher";
 
 interface NavProps { variant?: "transparent" | "solid"; }
 
@@ -13,6 +18,9 @@ export function Nav({ variant = "transparent" }: NavProps) {
   const [scrolled, setScrolled] = useState(variant === "solid");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, logout } = useAuth();
   const cartItems = useCart((s) => s.items);
@@ -26,15 +34,32 @@ export function Nav({ variant = "transparent" }: NavProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, [variant]);
 
+  const { t } = useLang();
   const links = [
-    { to: "/products", label: "Explore" },
-    { to: "/regions", label: "Regions" },
-    { to: "/brands", label: "Brands" },
-    { to: "/heritage", label: "Heritage" },
+    { to: "/products", label: t("nav.explore") },
+    { to: "/regions", label: t("nav.regions") },
+    { to: "/brands", label: t("nav.brands") },
+    { to: "/heritage", label: t("nav.heritage") },
+    { to: "/heritage-map", label: t("nav.heritageMap") },
   ];
 
   const onDark = !scrolled && variant === "transparent";
   const cartCount = cartItems.reduce((s, i) => s + i.quantity, 0);
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setMobileOpen(false);
+    setTimeout(() => searchInputRef.current?.focus(), 60);
+  };
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    setSearchOpen(false);
+    setSearchQuery("");
+    navigate({ to: "/products", search: { q } as any });
+  };
 
   const handleLogout = () => {
     logout();
@@ -80,23 +105,48 @@ export function Nav({ variant = "transparent" }: NavProps) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <IconBtn onDark={onDark} label="Search"><Search size={16} /></IconBtn>
+          {/* Desktop type-ahead search — enhancement alongside existing full-screen search */}
+          <SearchTypeahead onDark={onDark} />
 
-          <Link to="/wishlist" className="hidden sm:block">
-            <IconBtn onDark={onDark} label="Wishlist"><Heart size={16} /></IconBtn>
-          </Link>
+          <button type="button" onClick={openSearch} aria-label="Search"
+            className="w-10 h-10 rounded-full grid place-items-center transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              border: `1.5px solid ${onDark ? "rgba(245,237,216,0.3)" : "rgba(28,58,42,0.15)"}`,
+              color: onDark ? "#F5EDD8" : "#1C3A2A",
+              background: onDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.6)",
+            }}>
+            <Search size={16} />
+          </button>
 
-          {/* Cart with count badge */}
-          <Link to="/cart" className="hidden sm:block relative">
-            <IconBtn onDark={onDark} label="Cart"><ShoppingBag size={16} /></IconBtn>
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C9921A] text-[#1C3A2A] text-[10px] font-bold grid place-items-center">
-                {cartCount > 9 ? "9+" : cartCount}
-              </span>
-            )}
-          </Link>
+          <VoiceSearchButton onDark={onDark} />
 
-          {/* Notification Bell */}
+          {/* Language toggle */}
+          <div className="hidden lg:block">
+            <LanguageToggle />
+          </div>
+
+          <CurrencySwitcher />
+
+          {/* Wishlist — buyers only, with count badge */}
+          {user?.role === "buyer" && (
+            <Link to="/wishlist" className="hidden sm:block relative">
+              <IconBtn onDark={onDark} label="Wishlist"><Heart size={16} /></IconBtn>
+            </Link>
+          )}
+
+          {/* Cart — buyers only */}
+          {user?.role === "buyer" && (
+            <Link to="/cart" className="hidden sm:block relative">
+              <IconBtn onDark={onDark} label="Cart"><ShoppingBag size={16} /></IconBtn>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C9921A] text-[#1C3A2A] text-[10px] font-bold grid place-items-center">
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </Link>
+          )}
+
+          {/* Notification Bell — all logged-in users */}
           {user && <NotificationBell />}
 
           {/* Auth-aware user section */}
@@ -161,15 +211,23 @@ export function Nav({ variant = "transparent" }: NavProps) {
             <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="p-2"><X size={22} /></button>
           </div>
           <nav className="flex flex-col p-8 gap-6 overflow-y-auto">
+            <button type="button" onClick={openSearch}
+              className="font-display text-2xl text-left flex items-center gap-3 text-[#F5EDD8]">
+              <Search size={20} /> Search
+            </button>
             {links.map((l) => (
               <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)} className="font-display text-3xl">{l.label}</Link>
             ))}
-            <div className="h-px bg-[rgba(201,146,26,0.3)] my-2" />
-            <Link to="/cart" onClick={() => setMobileOpen(false)} className="font-display text-2xl flex items-center gap-3">
-              Cart {cartCount > 0 && <span className="text-[#C9921A] text-lg">({cartCount})</span>}
-            </Link>
-            <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="font-display text-2xl">Wishlist</Link>
-            <div className="h-px bg-[rgba(201,146,26,0.3)] my-2" />
+            {user?.role === "buyer" && (
+              <>
+                <div className="h-px bg-[rgba(201,146,26,0.3)] my-2" />
+                <Link to="/cart" onClick={() => setMobileOpen(false)} className="font-display text-2xl flex items-center gap-3">
+                  Cart {cartCount > 0 && <span className="text-[#C9921A] text-lg">({cartCount})</span>}
+                </Link>
+                <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="font-display text-2xl">Wishlist</Link>
+              </>
+            )}
+            <div className="h-px bg-[rgba(201,246,26,0.3)] my-2" />
             {user ? (
               <>
                 <Link to="/account" onClick={() => setMobileOpen(false)} className="font-display text-2xl">My Account</Link>
@@ -191,6 +249,35 @@ export function Nav({ variant = "transparent" }: NavProps) {
             <Link to="/sell" onClick={() => setMobileOpen(false)} className="font-display text-2xl text-[#C9921A]">Sell with PAARA</Link>
           </nav>
         </div>
+      )}
+      {searchOpen && (
+        <>
+          <div className="fixed inset-0 z-[70] bg-black/40 backdrop-blur-sm" onClick={() => setSearchOpen(false)} />
+          <div className="fixed top-0 left-0 right-0 z-[80] bg-[#1C3A2A] px-6 py-4 shadow-2xl border-b border-[rgba(201,146,26,0.25)]">
+            <form onSubmit={submitSearch} className="mx-auto max-w-2xl flex items-center gap-3">
+              <Search size={18} className="text-[#C9921A] flex-shrink-0" />
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products, artisans, crafts…"
+                className="flex-1 bg-transparent text-[#F5EDD8] placeholder-[rgba(245,237,216,0.4)] text-base outline-none"
+              />
+              {searchQuery && (
+                <button type="button" aria-label="Clear search" onClick={() => setSearchQuery("")} className="text-[rgba(245,237,216,0.5)] hover:text-[#F5EDD8]">
+                  <X size={16} />
+                </button>
+              )}
+              <button type="submit" className="px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ background: "#C9921A", color: "#1C3A2A" }}>
+                Search
+              </button>
+              <button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)} className="text-[rgba(245,237,216,0.5)] hover:text-[#F5EDD8] ml-1">
+                <X size={20} />
+              </button>
+            </form>
+          </div>
+        </>
       )}
     </header>
   );

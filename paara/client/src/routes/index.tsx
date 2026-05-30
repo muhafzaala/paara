@@ -9,6 +9,15 @@ import { Footer } from "@/components/site/Footer";
 import ProductImage from "@/components/ProductImage";
 import WelcomeBanner from "@/components/site/WelcomeBanner";
 import DemoBadge from "@/components/DemoBadge";
+import { ProductCardSkeleton } from "@/components/ui/Skeleton";
+import { HoverLift, FadeIn } from "@/components/ui/Motion";
+import RecentlyViewed from "@/components/RecentlyViewed";
+import { useLang } from "@/lib/i18n";
+import CalligraphyDivider from "@/components/ui/CalligraphyDivider";
+import CraftOfTheDay from "@/components/CraftOfTheDay";
+import RegionLeaderboard from "@/components/RegionLeaderboard";
+import LiveActivityTicker from "@/components/LiveActivityTicker";
+import SeasonalCuration from "@/components/SeasonalCuration";
 
 import badshahiBg from "@/assets/cities/Badshahi.jpg";
 import islamabadBg from "@/assets/cities/Islamabad.jpg";
@@ -64,6 +73,7 @@ const HERO_SLIDES = [
 
 function HomePage() {
   const [slide, setSlide] = useState(0);
+  const { t } = useLang();
   useEffect(() => {
     const t = setInterval(() => setSlide((s) => (s + 1) % HERO_SLIDES.length), 6000);
     return () => clearInterval(t);
@@ -79,14 +89,14 @@ function HomePage() {
         {HERO_SLIDES.map((s, i) => (
           <div
             key={s.label}
-            className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out"
+            className="absolute inset-0 kb-slide"
             style={{
               backgroundImage: `url(${s.img})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               opacity: i === slide ? 1 : 0,
-              transform: i === slide ? "scale(1.06)" : "scale(1)",
-              transition: "opacity 1800ms ease-in-out, transform 7000ms ease-out",
+              transition: "opacity 1800ms ease-in-out",
+              zIndex: i === slide ? 1 : 0,
             }}
           />
         ))}
@@ -160,7 +170,7 @@ function HomePage() {
           </form>
 
           <div className="rise-4 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/products" className="btn btn-primary">Explore Brands <ArrowRight size={16} /></Link>
+            <Link to="/products" search={{} as any} className="btn btn-primary">Explore Brands <ArrowRight size={16} /></Link>
             <Link to="/sell" className="btn btn-ghost">Sell with PAARA</Link>
           </div>
         </div>
@@ -169,6 +179,8 @@ function HomePage() {
           Scroll · میراث دیکھیں
         </div>
       </section>
+
+      <LiveActivityTicker />
 
       {/* TRUST BAR */}
       <section className="relative px-6 lg:px-12 -mt-16 z-20">
@@ -189,12 +201,14 @@ function HomePage() {
         </div>
       </section>
 
+      <CalligraphyDivider />
+
       {/* REGIONS */}
       <section className="px-6 lg:px-12 py-24 md:py-32">
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
             <div>
-              <p className="eyebrow mb-4">Explore by Region</p>
+              <p className="eyebrow mb-4">{t("heading.exploreRegion")}</p>
               <h2 className="text-4xl md:text-5xl max-w-[18ch] leading-[1.1]">
                 Each region holds its own <em className="italic text-[#C9921A]">hand</em>.
               </h2>
@@ -236,6 +250,8 @@ function HomePage() {
         </div>
       </section>
 
+      <CalligraphyDivider label="حرفِ ہنر" />
+
       {/* EDITORIAL STORY */}
       <section className="px-6 lg:px-12 py-12">
         <div className="mx-auto max-w-[1280px] rounded-[24px] overflow-hidden grid md:grid-cols-[1.1fr_0.9fr] bg-[#1C3A2A] text-[#F5EDD8] shadow-[var(--shadow-card)] group">
@@ -269,17 +285,19 @@ function HomePage() {
         </div>
       </section>
 
+      <CalligraphyDivider label="Heritage" />
+
       {/* FEATURED PRODUCTS */}
       <section className="px-6 lg:px-12 py-24 md:py-32">
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
             <div>
-              <p className="eyebrow mb-4">Pakistan's Most Celebrated</p>
+              <p className="eyebrow mb-4">{t("heading.featured")}</p>
               <h2 className="text-4xl md:text-5xl max-w-[20ch] leading-[1.1]">
                 Quiet pieces, <em className="italic text-[#C9921A]">loud</em> in their making.
               </h2>
             </div>
-            <Link to="/products" className="btn btn-outline-forest self-start md:self-end">
+            <Link to="/products" search={{} as any} className="btn btn-outline-forest self-start md:self-end">
               View all <ArrowRight size={14} />
             </Link>
           </div>
@@ -287,6 +305,8 @@ function HomePage() {
           <FeaturedProducts />
         </div>
       </section>
+
+      <CalligraphyDivider label="پارہ" />
 
       {/* TESTIMONIALS */}
       <section className="px-6 lg:px-12 py-16">
@@ -321,6 +341,47 @@ function HomePage() {
         </div>
       </section>
 
+      {/* SEASONAL CURATION */}
+      <section className="py-16">
+        <SeasonalCuration />
+      </section>
+
+      <CalligraphyDivider />
+
+      {/* QUIZ BANNER */}
+      <section className="px-6 lg:px-12 py-6">
+        <div className="mx-auto max-w-[1280px]">
+          <Link to="/quiz"
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-[20px] px-8 py-6 transition-all hover:shadow-lg"
+            style={{ background: "linear-gradient(135deg, #C9921A 0%, #E5A82E 50%, #C9921A 100%)", backgroundSize: "200% 200%" }}>
+            <div>
+              <p className="eyebrow !text-[rgba(28,58,42,0.7)] mb-1">1-Minute Quiz</p>
+              <p className="display-serif text-xl md:text-2xl text-[#1C3A2A]">Test your heritage knowledge</p>
+              <p className="text-sm text-[rgba(28,58,42,0.7)] mt-1">10 questions · Pakistani crafts & regions</p>
+            </div>
+            <span className="btn shrink-0 bg-[#1C3A2A] text-[#F5EDD8] hover:bg-[#0F2219] flex items-center gap-2">
+              Take the quiz <ArrowRight size={14} />
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <CalligraphyDivider />
+
+      {/* REGION LEADERBOARD */}
+      <section className="py-16">
+        <RegionLeaderboard />
+      </section>
+
+      <CalligraphyDivider />
+
+      {/* CRAFT OF THE DAY */}
+      <section className="my-16">
+        <CraftOfTheDay />
+      </section>
+
+      <CalligraphyDivider label="پارہ" />
+
       {/* FINAL CTA */}
       <section className="px-6 lg:px-12 py-24">
         <div
@@ -339,11 +400,33 @@ function HomePage() {
             Discover verified artisans, regional collections, and the stories behind every craft.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link to="/products" className="btn btn-primary">Begin Exploring</Link>
+            <Link to="/products" search={{} as any} className="btn btn-primary">Begin Exploring</Link>
             <Link to="/sell" className="btn btn-ghost">Become an Artisan</Link>
           </div>
         </div>
       </section>
+
+      {/* HERITAGE MAP CTA */}
+      <section className="px-6 lg:px-12 py-12">
+        <div className="mx-auto max-w-[1280px]">
+          <FadeIn>
+            <div className="rounded-[20px] overflow-hidden bg-[#1C3A2A] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <p className="eyebrow text-[#C9921A] mb-2">Craft Geography</p>
+                <h3 className="display-serif text-2xl md:text-3xl text-[#F5EDD8] mb-2">{t("heading.heritageMap")}</h3>
+                <p className="text-[rgba(245,237,216,0.75)] text-sm max-w-md leading-relaxed">
+                  Discover craft traditions mapped across 16 cities — from Multan's blue pottery to Hunza's walnut carving.
+                </p>
+              </div>
+              <Link to="/heritage-map" className="btn btn-primary flex-shrink-0">
+                {t("btn.exploreMap")} <ArrowRight size={16} />
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      <RecentlyViewed />
 
       <Footer />
     </div>
@@ -366,29 +449,22 @@ function FeaturedProducts() {
 
   if (isLoading) return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-      {[0,1,2,3].map(i => (
-        <div key={i} className="rounded-[20px] bg-white overflow-hidden animate-pulse">
-          <div className="h-56 bg-[rgba(28,58,42,0.08)]" />
-          <div className="p-5 space-y-2">
-            <div className="h-3 w-12 rounded bg-[rgba(28,58,42,0.08)]" />
-            <div className="h-5 w-full rounded bg-[rgba(28,58,42,0.08)]" />
-            <div className="h-4 w-20 rounded bg-[rgba(28,58,42,0.08)]" />
-          </div>
-        </div>
-      ))}
+      {[0,1,2,3].map(i => <ProductCardSkeleton key={i} />)}
     </div>
   );
 
   if (products.length === 0) return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
       {[
-        { name: "Hand-Painted Blue Vase", artisan: "Master Ustad Naseer", region: "Multan", price: 14500 },
-        { name: "Hunza Walnut Tea Tray", artisan: "Karim Wood Studio", region: "Hunza", price: 9800 },
-        { name: "Ajrak Cotton Shawl", artisan: "Sindhi Heritage House", region: "Sindh", price: 6200 },
-        { name: "Peshawar Copper Pitcher", artisan: "Bukhari Brothers", region: "Peshawar", price: 11300 },
+        { name: "Hand-Painted Blue Vase", artisan: "Master Ustad Naseer", region: "Multan", price: 14500, img: multanImg },
+        { name: "Hunza Walnut Tea Tray", artisan: "Karim Wood Studio", region: "Hunza", price: 9800, img: hunzaImg },
+        { name: "Ajrak Cotton Shawl", artisan: "Sindhi Heritage House", region: "Sindh", price: 6200, img: karachiImg },
+        { name: "Peshawar Copper Pitcher", artisan: "Bukhari Brothers", region: "Peshawar", price: 11300, img: peshawarImg },
       ].map((p) => (
-        <Link key={p.name} to="/products" className="paara-card block group">
-          <div className="img-wrap bg-gradient-to-br from-[#1C3A2A] to-[#264D38]" />
+        <Link key={p.name} to="/products" search={{} as any} className="paara-card block group">
+          <div className="img-wrap">
+            <img src={p.img} alt={p.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          </div>
           <div className="p-5">
             <p className="eyebrow mb-2">{p.region}</p>
             <h3 className="display-serif text-lg text-[#1C3A2A] leading-tight mb-1 line-clamp-2">{p.name}</h3>
@@ -407,23 +483,25 @@ function FeaturedProducts() {
         const img = p.images?.[0];
         const artisan = p.artisan || p.seller?.shopName || p.seller?.name;
         return (
-          <Link key={id} to="/products/$id" params={{ id }} className="paara-card block group">
-            <div className="img-wrap">
-              <div className="relative w-full h-full">
-                {p.isDemo && <DemoBadge position="top-left" />}
-                <ProductImage src={img} alt={p.name} size="md" />
+          <HoverLift key={id}>
+            <Link to="/products/$id" params={{ id }} search={{} as any} className="paara-card block group">
+              <div className="img-wrap">
+                <div className="relative w-full h-full">
+                  {p.isDemo && <DemoBadge position="top-left" />}
+                  <ProductImage src={img} alt={p.name} size="md" />
+                </div>
               </div>
-            </div>
-            <div className="p-5">
-              <p className="eyebrow mb-2">{p.city || p.region}</p>
-              <h3 className="display-serif text-lg text-[#1C3A2A] leading-tight mb-1 line-clamp-2">{p.name}</h3>
-              <p className="text-xs text-[#6B645A] mb-3">{artisan}</p>
-              <div className="flex items-center justify-between">
-                <span className="font-display text-xl font-semibold text-[#C9921A]">{formatPKR(p.price)}</span>
-                <span className="text-xs uppercase tracking-[0.12em] font-semibold text-[#1C3A2A] group-hover:text-[#C9921A] transition-colors">View →</span>
+              <div className="p-5">
+                <p className="eyebrow mb-2">{p.city || p.region}</p>
+                <h3 className="display-serif text-lg text-[#1C3A2A] leading-tight mb-1 line-clamp-2">{p.name}</h3>
+                <p className="text-xs text-[#6B645A] mb-3">{artisan}</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-xl font-semibold text-[#C9921A]">{formatPKR(p.price)}</span>
+                  <span className="text-xs uppercase tracking-[0.12em] font-semibold text-[#1C3A2A] group-hover:text-[#C9921A] transition-colors">View →</span>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </HoverLift>
         );
       })}
     </div>

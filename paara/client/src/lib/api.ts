@@ -41,6 +41,7 @@ export const authApi = {
   disable2FA: (password: string) => api.post("/auth/2fa/disable", { password }),
   // Admin 2FA challenge (unauthenticated, uses challengeToken)
   verifyAdmin2FA: (challengeToken: string, code: string) => api.post("/auth/verify-2fa", { challengeToken, code }),
+  verifyAdminTOTP: (challengeToken: string, code: string) => api.post("/auth/verify-totp", { challengeToken, code }),
   resendOTP: (challengeToken: string, purpose?: string) => api.post("/auth/resend-otp", { challengeToken, purpose }),
   // Authenticated OTP (email verify, etc.)
   requestOTP: (purpose: string, channel: string = "console") => api.post("/auth/otp/request", { purpose, channel }),
@@ -74,6 +75,7 @@ export const couponsApi = {
 
 export const ordersApi = {
   getMyOrders: () => api.get("/orders/my-orders"),
+  getPassport: () => api.get("/orders/passport"),
   getOne: (id: string) => api.get(`/orders/${id}`),
   getTracking: (id: string) => api.get(`/orders/${id}/tracking`),
   cancel: (id: string, reason: string) => api.patch(`/orders/${id}/cancel`, { reason }),
@@ -186,6 +188,8 @@ export const adminApi = {
     api.patch(`/admin/seller-profiles/${id}/advance`, { stage, notes }),
   awardBadge: (id: string, badge: string, action: "add" | "remove") =>
     api.patch(`/admin/seller-profiles/${id}/badges`, { badge, action }),
+  requestMoreInfo: (id: string, notes: string) =>
+    api.patch(`/admin/seller-profiles/${id}/request-info`, { notes }),
 };
 
 export const sellerApi = {
@@ -194,7 +198,7 @@ export const sellerApi = {
   updateMyProfile: (data: object) => api.patch("/seller/profile", data),
   submitApplication: () => api.post("/seller/profile/submit-application"),
   getOrders: (params?: object) => api.get("/seller/orders", { params }),
-  getAnalytics: () => api.get("/seller/analytics"),
+  getAnalytics: (params?: object) => api.get("/seller/analytics", { params }),
   getPayouts: () => api.get("/payouts/seller"),
   getBalance: () => api.get("/payouts/balance"),
   requestPayout: (data: object) => api.post("/payouts/request", data),
@@ -221,6 +225,15 @@ export const adminMgmtApi = {
     api.patch(`/admin/admins/${id}/status`, { status }),
   removeAdmin: (id: string) => api.delete(`/admin/admins/${id}`),
   adminActivity: () => api.get("/admin/admin-activity"),
+};
+
+export const assistantApi = {
+  chat: (messages: Array<{ role: string; content: string }>) =>
+    api.post("/assistant/chat", { messages }),
+};
+
+export const leaderboardApi = {
+  getRegions: () => api.get("/admin/leaderboard/regions"),
 };
 
 export default api;

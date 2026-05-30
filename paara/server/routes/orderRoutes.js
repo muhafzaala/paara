@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getMyOrders, getOrder, getTracking, cancelOrder, updateOrderStatus, getSellerOrders } = require("../controllers/orderController");
+const { getMyOrders, getOrder, getTracking, cancelOrder, updateOrderStatus, getSellerOrders, getPassportData } = require("../controllers/orderController");
 const { protect, sellerOrAdmin } = require("../middleware/authMiddleware");
 router.use(protect);
 router.get("/my-orders", getMyOrders);
+router.get("/passport", getPassportData);
 router.get("/seller/orders", getSellerOrders);
 router.get("/:id", getOrder);
 router.get("/:id/tracking", getTracking);

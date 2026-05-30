@@ -1,15 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Twitter, Youtube } from "lucide-react";
-import logo from "@/assets/paara-logo.png";
+import { PaaraLogo } from "./PaaraLogo";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 export function Footer() {
   return (
+    <>
     <footer className="bg-[#0F2219] text-[#F5EDD8] mt-32">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-12 py-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <img src={logo} alt="PAARA" className="w-12 h-12 rounded-lg" />
+              <PaaraLogo height={80} />
               <div>
                 <div className="font-display text-2xl tracking-[0.32em]">PAARA</div>
                 <div className="urdu text-[#C9921A] text-sm">پارہ</div>
@@ -94,6 +96,8 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    <ThemeSwitcher />
+    </>
   );
 }
 

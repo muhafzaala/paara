@@ -12,11 +12,15 @@ export type User = {
   shopName?: string;
   verificationStatus?: string;
   city?: string;
+  twoFactorEnabled?: boolean;
+  twoFactorRequired?: boolean;
+  isPrimaryAdmin?: boolean;
 };
 
 type AuthState = {
   user: User | null;
   token: string | null;
+  challengeToken: string | null;
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
@@ -32,6 +36,8 @@ type AuthState = {
   logout: () => void;
   clearError: () => void;
   setUser: (user: User) => void;
+  setToken: (token: string) => void;
+  setChallenge: (token: string | null) => void;
 };
 
 export const useAuth = create<AuthState>()(
@@ -39,6 +45,7 @@ export const useAuth = create<AuthState>()(
     (set, _get) => ({
       user: null,
       token: null,
+      challengeToken: null,
       isLoading: false,
       error: null,
 
@@ -94,7 +101,14 @@ export const useAuth = create<AuthState>()(
 
       clearError: () => set({ error: null }),
 
-      setUser: (user) => set({ user }),
+      setUser: (user) => { localStorage.setItem("paara_user", JSON.stringify(user)); set({ user }); },
+
+      setToken: (token) => {
+        localStorage.setItem("paara_token", token);
+        set({ token });
+      },
+
+      setChallenge: (challengeToken) => set({ challengeToken }),
     }),
     {
       name: "paara-auth",
