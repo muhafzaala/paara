@@ -60,10 +60,10 @@ function SellerProductsPage() {
         <form onSubmit={handleSave} className="bg-white rounded-[20px] p-6 border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
           <h3 className="display-serif text-2xl text-[#1C3A2A] mb-6">{editing ? "Edit product" : "New product"}</h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            <F label="Product name *" value={form.name} onChange={(v) => f("name", v)} />
-            <F label="Artisan name" value={form.artisan} onChange={(v) => f("artisan", v)} placeholder="Display name shown to buyers" />
-            <F label="Price (PKR) *" value={form.price} onChange={(v) => f("price", v)} type="number" />
-            <F label="Original price (PKR)" value={form.originalPrice} onChange={(v) => f("originalPrice", v)} type="number" placeholder="Optional — for discount display" />
+            <F label="Product name *" value={form.name} onChange={(v: string) => f("name", v)} />
+            <F label="Artisan name" value={form.artisan} onChange={(v: string) => f("artisan", v)} placeholder="Display name shown to buyers" />
+            <F label="Price (PKR) *" value={form.price} onChange={(v: string) => f("price", v)} type="number" />
+            <F label="Original price (PKR)" value={form.originalPrice} onChange={(v: string) => f("originalPrice", v)} type="number" placeholder="Optional — for discount display" />
             <div>
               <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-[#1C3A2A] mb-1">Category *</label>
               <select value={form.category} onChange={(e) => f("category", e.target.value)} className="w-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9921A]">
@@ -76,8 +76,8 @@ function SellerProductsPage() {
                 {CITIES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
-            <F label="Material" value={form.material} onChange={(v) => f("material", v)} placeholder="e.g. Glazed earthenware, Solid walnut" />
-            <F label="Stock quantity" value={form.stock} onChange={(v) => f("stock", v)} type="number" />
+            <F label="Material" value={form.material} onChange={(v: string) => f("material", v)} placeholder="e.g. Glazed earthenware, Solid walnut" />
+            <F label="Stock quantity" value={form.stock} onChange={(v: string) => f("stock", v)} type="number" />
             <div className="sm:col-span-2">
               <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-[#1C3A2A] mb-1">Description *</label>
               <textarea value={form.description} onChange={(e) => f("description", e.target.value)} rows={3} className="w-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] rounded-[12px] px-4 py-3 text-sm focus:outline-none focus:border-[#C9921A] resize-none" />
@@ -86,8 +86,8 @@ function SellerProductsPage() {
               <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-[#1C3A2A] mb-1">Origin story</label>
               <textarea value={form.originStory} onChange={(e) => f("originStory", e.target.value)} rows={3} placeholder="The heritage story behind this piece…" className="w-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] rounded-[12px] px-4 py-3 text-sm focus:outline-none focus:border-[#C9921A] resize-none" />
             </div>
-            <F label="Care instructions" value={form.care} onChange={(v) => f("care", v)} placeholder="How to care for this item" />
-            <F label="Dimensions / Details" value={form.details} onChange={(v) => f("details", v)} placeholder="Size, weight, etc." />
+            <F label="Care instructions" value={form.care} onChange={(v: string) => f("care", v)} placeholder="How to care for this item" />
+            <F label="Dimensions / Details" value={form.details} onChange={(v: string) => f("details", v)} placeholder="Size, weight, etc." />
           </div>
           <div className="flex gap-3 mt-6">
             <button type="submit" disabled={saving} className="btn btn-primary disabled:opacity-60">{saving ? <Loader2 size={14} className="animate-spin" /> : "Save product"}</button>

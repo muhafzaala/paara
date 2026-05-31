@@ -19,13 +19,16 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RegionsRouteImport } from './routes/regions'
 import { Route as RefundsRouteImport } from './routes/refunds'
+import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HeritageMapRouteImport } from './routes/heritage-map'
 import { Route as HeritageRouteImport } from './routes/heritage'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CareersRouteImport } from './routes/careers'
@@ -50,6 +53,8 @@ import { Route as ProductsIdRouteImport } from './routes/products.$id'
 import { Route as HeritageIdRouteImport } from './routes/heritage.$id'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminStoriesRouteImport } from './routes/admin.stories'
+import { Route as AdminSetup2faRouteImport } from './routes/admin.setup-2fa'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSellersRouteImport } from './routes/admin.sellers'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -57,8 +62,10 @@ import { Route as AdminAuditLogRouteImport } from './routes/admin.audit-log'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdminsRouteImport } from './routes/admin.admins'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
+import { Route as AccountStoriesRouteImport } from './routes/account.stories'
 import { Route as AccountSettingsRouteImport } from './routes/account.settings'
 import { Route as AccountRequestAdminRouteImport } from './routes/account.request-admin'
+import { Route as AccountPassportRouteImport } from './routes/account.passport'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountAddressesRouteImport } from './routes/account.addresses'
 import { Route as AccountOrdersIdRouteImport } from './routes/account.orders.$id'
@@ -113,6 +120,11 @@ const RefundsRoute = RefundsRouteImport.update({
   path: '/refunds',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -133,6 +145,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HeritageMapRoute = HeritageMapRouteImport.update({
+  id: '/heritage-map',
+  path: '/heritage-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HeritageRoute = HeritageRouteImport.update({
   id: '/heritage',
   path: '/heritage',
@@ -146,6 +163,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -269,6 +291,16 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStoriesRoute = AdminStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSetup2faRoute = AdminSetup2faRouteImport.update({
+  id: '/setup-2fa',
+  path: '/setup-2fa',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -304,6 +336,11 @@ const AccountWishlistRoute = AccountWishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountStoriesRoute = AccountStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AccountRoute,
+} as any)
 const AccountSettingsRoute = AccountSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -312,6 +349,11 @@ const AccountSettingsRoute = AccountSettingsRouteImport.update({
 const AccountRequestAdminRoute = AccountRequestAdminRouteImport.update({
   id: '/request-admin',
   path: '/request-admin',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountPassportRoute = AccountPassportRouteImport.update({
+  id: '/passport',
+  path: '/passport',
   getParentRoute: () => AccountRoute,
 } as any)
 const AccountOrdersRoute = AccountOrdersRouteImport.update({
@@ -339,13 +381,16 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/heritage': typeof HeritageRouteWithChildren
+  '/heritage-map': typeof HeritageMapRoute
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/quiz': typeof QuizRoute
   '/refunds': typeof RefundsRoute
   '/regions': typeof RegionsRoute
   '/register': typeof RegisterRoute
@@ -358,8 +403,10 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/passport': typeof AccountPassportRoute
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
+  '/account/stories': typeof AccountStoriesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -367,6 +414,8 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/setup-2fa': typeof AdminSetup2faRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/heritage/$id': typeof HeritageIdRoute
@@ -392,13 +441,16 @@ export interface FileRoutesByTo {
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/heritage': typeof HeritageRouteWithChildren
+  '/heritage-map': typeof HeritageMapRoute
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/quiz': typeof QuizRoute
   '/refunds': typeof RefundsRoute
   '/regions': typeof RegionsRoute
   '/register': typeof RegisterRoute
@@ -410,8 +462,10 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/passport': typeof AccountPassportRoute
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
+  '/account/stories': typeof AccountStoriesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -419,6 +473,8 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/setup-2fa': typeof AdminSetup2faRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/heritage/$id': typeof HeritageIdRoute
@@ -447,13 +503,16 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/heritage': typeof HeritageRouteWithChildren
+  '/heritage-map': typeof HeritageMapRoute
   '/login': typeof LoginRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/quiz': typeof QuizRoute
   '/refunds': typeof RefundsRoute
   '/regions': typeof RegionsRoute
   '/register': typeof RegisterRoute
@@ -466,8 +525,10 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/account/addresses': typeof AccountAddressesRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
+  '/account/passport': typeof AccountPassportRoute
   '/account/request-admin': typeof AccountRequestAdminRoute
   '/account/settings': typeof AccountSettingsRoute
+  '/account/stories': typeof AccountStoriesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/admins': typeof AdminAdminsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -475,6 +536,8 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/sellers': typeof AdminSellersRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/setup-2fa': typeof AdminSetup2faRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/heritage/$id': typeof HeritageIdRoute
@@ -504,13 +567,16 @@ export interface FileRouteTypes {
     | '/careers'
     | '/cart'
     | '/checkout'
+    | '/compare'
     | '/contact'
     | '/forgot-password'
     | '/heritage'
+    | '/heritage-map'
     | '/login'
     | '/press'
     | '/privacy'
     | '/products'
+    | '/quiz'
     | '/refunds'
     | '/regions'
     | '/register'
@@ -523,8 +589,10 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/passport'
     | '/account/request-admin'
     | '/account/settings'
+    | '/account/stories'
     | '/account/wishlist'
     | '/admin/admins'
     | '/admin/analytics'
@@ -532,6 +600,8 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/sellers'
     | '/admin/settings'
+    | '/admin/setup-2fa'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verifications'
     | '/heritage/$id'
@@ -557,13 +627,16 @@ export interface FileRouteTypes {
     | '/careers'
     | '/cart'
     | '/checkout'
+    | '/compare'
     | '/contact'
     | '/forgot-password'
     | '/heritage'
+    | '/heritage-map'
     | '/login'
     | '/press'
     | '/privacy'
     | '/products'
+    | '/quiz'
     | '/refunds'
     | '/regions'
     | '/register'
@@ -575,8 +648,10 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/passport'
     | '/account/request-admin'
     | '/account/settings'
+    | '/account/stories'
     | '/account/wishlist'
     | '/admin/admins'
     | '/admin/analytics'
@@ -584,6 +659,8 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/sellers'
     | '/admin/settings'
+    | '/admin/setup-2fa'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verifications'
     | '/heritage/$id'
@@ -611,13 +688,16 @@ export interface FileRouteTypes {
     | '/careers'
     | '/cart'
     | '/checkout'
+    | '/compare'
     | '/contact'
     | '/forgot-password'
     | '/heritage'
+    | '/heritage-map'
     | '/login'
     | '/press'
     | '/privacy'
     | '/products'
+    | '/quiz'
     | '/refunds'
     | '/regions'
     | '/register'
@@ -630,8 +710,10 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/addresses'
     | '/account/orders'
+    | '/account/passport'
     | '/account/request-admin'
     | '/account/settings'
+    | '/account/stories'
     | '/account/wishlist'
     | '/admin/admins'
     | '/admin/analytics'
@@ -639,6 +721,8 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/sellers'
     | '/admin/settings'
+    | '/admin/setup-2fa'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verifications'
     | '/heritage/$id'
@@ -667,13 +751,16 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HeritageRoute: typeof HeritageRouteWithChildren
+  HeritageMapRoute: typeof HeritageMapRoute
   LoginRoute: typeof LoginRoute
   PressRoute: typeof PressRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  QuizRoute: typeof QuizRoute
   RefundsRoute: typeof RefundsRoute
   RegionsRoute: typeof RegionsRoute
   RegisterRoute: typeof RegisterRoute
@@ -759,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -787,6 +881,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/heritage-map': {
+      id: '/heritage-map'
+      path: '/heritage-map'
+      fullPath: '/heritage-map'
+      preLoaderRoute: typeof HeritageMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/heritage': {
       id: '/heritage'
       path: '/heritage'
@@ -806,6 +907,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -976,6 +1084,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/stories': {
+      id: '/admin/stories'
+      path: '/stories'
+      fullPath: '/admin/stories'
+      preLoaderRoute: typeof AdminStoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/setup-2fa': {
+      id: '/admin/setup-2fa'
+      path: '/setup-2fa'
+      fullPath: '/admin/setup-2fa'
+      preLoaderRoute: typeof AdminSetup2faRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -1025,6 +1147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountWishlistRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/stories': {
+      id: '/account/stories'
+      path: '/stories'
+      fullPath: '/account/stories'
+      preLoaderRoute: typeof AccountStoriesRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/account/settings': {
       id: '/account/settings'
       path: '/settings'
@@ -1037,6 +1166,13 @@ declare module '@tanstack/react-router' {
       path: '/request-admin'
       fullPath: '/account/request-admin'
       preLoaderRoute: typeof AccountRequestAdminRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/passport': {
+      id: '/account/passport'
+      path: '/passport'
+      fullPath: '/account/passport'
+      preLoaderRoute: typeof AccountPassportRouteImport
       parentRoute: typeof AccountRoute
     }
     '/account/orders': {
@@ -1078,8 +1214,10 @@ const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
 interface AccountRouteChildren {
   AccountAddressesRoute: typeof AccountAddressesRoute
   AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
+  AccountPassportRoute: typeof AccountPassportRoute
   AccountRequestAdminRoute: typeof AccountRequestAdminRoute
   AccountSettingsRoute: typeof AccountSettingsRoute
+  AccountStoriesRoute: typeof AccountStoriesRoute
   AccountWishlistRoute: typeof AccountWishlistRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
@@ -1087,8 +1225,10 @@ interface AccountRouteChildren {
 const AccountRouteChildren: AccountRouteChildren = {
   AccountAddressesRoute: AccountAddressesRoute,
   AccountOrdersRoute: AccountOrdersRouteWithChildren,
+  AccountPassportRoute: AccountPassportRoute,
   AccountRequestAdminRoute: AccountRequestAdminRoute,
   AccountSettingsRoute: AccountSettingsRoute,
+  AccountStoriesRoute: AccountStoriesRoute,
   AccountWishlistRoute: AccountWishlistRoute,
   AccountIndexRoute: AccountIndexRoute,
 }
@@ -1103,6 +1243,8 @@ interface AdminRouteChildren {
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSellersRoute: typeof AdminSellersRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSetup2faRoute: typeof AdminSetup2faRoute
+  AdminStoriesRoute: typeof AdminStoriesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1115,6 +1257,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsRoute: AdminProductsRoute,
   AdminSellersRoute: AdminSellersRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSetup2faRoute: AdminSetup2faRoute,
+  AdminStoriesRoute: AdminStoriesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -1182,13 +1326,16 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HeritageRoute: HeritageRouteWithChildren,
+  HeritageMapRoute: HeritageMapRoute,
   LoginRoute: LoginRoute,
   PressRoute: PressRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  QuizRoute: QuizRoute,
   RefundsRoute: RefundsRoute,
   RegionsRoute: RegionsRoute,
   RegisterRoute: RegisterRoute,

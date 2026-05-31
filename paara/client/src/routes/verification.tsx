@@ -137,7 +137,7 @@ function VerificationPage() {
             <form onSubmit={handleSubmit} className="bg-white rounded-[24px] p-6 md:p-8 border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)] space-y-6">
               <h2 className="display-serif text-2xl text-[#1C3A2A]">Apply for verification</h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Business / Atelier name *" value={form.businessName} onChange={v => setForm({...form, businessName: v})} placeholder="e.g. Karim Wood Studio" />
+                <Field label="Business / Atelier name *" value={form.businessName} onChange={(v: string) => setForm({...form, businessName: v})} placeholder="e.g. Karim Wood Studio" />
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-[0.14em] text-[#1C3A2A] mb-1">Business type</label>
                   <select value={form.businessType} onChange={e => setForm({...form, businessType: e.target.value})} className="w-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9921A]">
@@ -154,10 +154,10 @@ function VerificationPage() {
                     {CITIES.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
-                <Field label="CNIC number" value={form.cnicNumber} onChange={v => setForm({...form, cnicNumber: v})} placeholder="42101-XXXXXXX-X" />
-                <Field label="Years of experience" value={form.yearsOfExperience} onChange={v => setForm({...form, yearsOfExperience: v})} type="number" placeholder="5" />
+                <Field label="CNIC number" value={form.cnicNumber} onChange={(v: string) => setForm({...form, cnicNumber: v})} placeholder="42101-XXXXXXX-X" />
+                <Field label="Years of experience" value={form.yearsOfExperience} onChange={(v: string) => setForm({...form, yearsOfExperience: v})} type="number" placeholder="5" />
                 <div className="sm:col-span-2">
-                  <Field label="Workshop / Studio address *" value={form.workshopAddress} onChange={v => setForm({...form, workshopAddress: v})} placeholder="Street, area, city" />
+                  <Field label="Workshop / Studio address *" value={form.workshopAddress} onChange={(v: string) => setForm({...form, workshopAddress: v})} placeholder="Street, area, city" />
                 </div>
               </div>
 

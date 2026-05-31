@@ -59,7 +59,7 @@ function OrdersPage() {
         <div className="text-center py-16 bg-white rounded-[20px] border border-[rgba(28,58,42,0.08)]">
           <Package size={40} className="text-[rgba(28,58,42,0.2)] mx-auto mb-4" />
           <p className="display-serif text-xl text-[#1C3A2A] mb-2">No orders yet</p>
-          <Link to="/products" className="btn btn-primary">Start exploring</Link>
+          <Link to="/products" search={{} as any} className="btn btn-primary">Start exploring</Link>
         </div>
       ) : (
         <div className="space-y-4">

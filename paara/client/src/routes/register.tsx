@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { Mail, Lock, User as UserIcon, ArrowRight, Store, ShoppingBag, Loader2, ShieldCheck, RotateCcw } from "lucide-react";
 import hunzaImg from "@/assets/cities/Hunza.jpg";
-import logo from "@/assets/paara-logo.png";
+import { PaaraLogo } from "@/components/site/PaaraLogo";
+import { PakistanFlag } from "@/components/site/PakistanFlag";
 import { useAuth } from "@/lib/auth-store";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
@@ -83,7 +84,7 @@ function RegisterPage() {
     <div className="min-h-screen grid md:grid-cols-[1fr_1.05fr] bg-[#F5EDD8]">
       <div className="flex flex-col px-6 sm:px-12 lg:px-20 py-12 lg:py-20 order-2 md:order-1">
         <Link to="/" className="md:hidden flex items-center gap-3 mb-10">
-          <img src={logo} alt="PAARA" className="w-10 h-10 rounded-lg" />
+          <PaaraLogo height={48} />
           <span className="font-display text-xl tracking-[0.32em] text-[#1C3A2A]">PAARA</span>
         </Link>
 
@@ -195,11 +196,11 @@ function RegisterPage() {
       <div className="relative hidden md:block overflow-hidden order-1 md:order-2 bg-[#01411C]">
         <img src={hunzaImg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 hero-zoom" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="paara-flag"><div className="paara-flag-inner"><div className="paara-flag-white" /><div className="paara-flag-green"><svg viewBox="0 0 200 200" className="paara-crescent" aria-hidden><circle cx="100" cy="100" r="56" fill="#fff" /><circle cx="118" cy="92" r="48" fill="#01411C" /><polygon fill="#fff" points="138,96 146,118 124,104 102,118 110,96 92,82 116,82 124,60 132,82 156,82" /></svg></div></div></div>
+          <PakistanFlag />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-[rgba(1,65,28,0.35)] via-transparent to-[rgba(1,65,28,0.85)]" />
         <div className="relative h-full flex flex-col justify-between p-12 text-[#F5EDD8]">
-          <Link to="/" className="ml-auto"><img src={logo} alt="PAARA" className="h-28 w-auto object-contain drop-shadow-[0_6px_24px_rgba(0,0,0,0.55)]" /></Link>
+          <Link to="/" className="ml-auto"><PaaraLogo height={120} /></Link>
           <div>
             <p className="eyebrow !text-[#C9921A] mb-4">A Quiet Welcome</p>
             <h2 className="display-serif text-4xl lg:text-5xl leading-tight max-w-[18ch] mb-4">Join a circle of <em className="italic text-[#C9921A]">makers</em> and admirers.</h2>

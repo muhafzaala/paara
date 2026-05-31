@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate, redirect } from "@tanstack/react-router";
-import { User, Package, Heart, MapPin, Settings, LogOut, Menu, X } from "lucide-react";
+import { User, Package, Heart, MapPin, Settings, LogOut, Menu, X, Globe } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/account/wishlist" as const, label: "Wishlist", icon: Heart },
   { to: "/account/addresses" as const, label: "Addresses", icon: MapPin },
   { to: "/account/settings" as const, label: "Settings & 2FA", icon: Settings },
+  { to: "/account/passport" as const, label: "Heritage Passport", icon: Globe },
 ];
 
 function AccountLayout() {

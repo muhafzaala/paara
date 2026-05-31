@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const Review = require("../models/Review");
+const { notifyUser, notifyAllBuyers } = require("../utils/notify");
 const SellerProfile = require("../models/SellerProfile");
 
 // GET /api/v1/admin/dashboard
@@ -112,6 +113,40 @@ exports.moderateProduct = async (req, res) => {
     if (!statusMap[action]) return res.status(400).json({ success: false, message: "Invalid action" });
     const product = await Product.findByIdAndUpdate(req.params.id, { status: statusMap[action], moderationNotes: notes, moderatedBy: req.user._id, moderatedAt: new Date() }, { new: true });
     if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+
+    if (action === "approve") {
+      notifyUser(product.seller, {
+        type: "product_approved",
+        title: "Product approved",
+        message: `"${product.name}" is now live on PAARA.`,
+        link: `/products/${product._id}`,
+        metadata: { productId: product._id },
+      });
+      notifyAllBuyers({
+        type: "new_product_submitted",
+        title: "New craft listed",
+        message: `"${product.name}" is now available.`,
+        link: `/products/${product._id}`,
+        metadata: { productId: product._id },
+      });
+    } else if (action === "reject") {
+      notifyUser(product.seller, {
+        type: "product_rejected",
+        title: "Product not approved",
+        message: `"${product.name}" was not approved${notes ? `: ${notes}` : "."}`,
+        link: `/seller/products`,
+        metadata: { productId: product._id },
+      });
+    } else if (action === "suspend") {
+      notifyUser(product.seller, {
+        type: "product_resubmit_requested",
+        title: "Product suspended",
+        message: `"${product.name}" was suspended${notes ? `: ${notes}` : "."}`,
+        link: `/seller/products`,
+        metadata: { productId: product._id },
+      });
+    }
+
     res.json({ success: true, product });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -262,4 +297,25 @@ exports.getFullStats = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+};
+
+// GET /api/v1/admin/leaderboard/regions  (public — no auth required)
+exports.getRegionLeaderboard = async (req, res) => {
+  try {
+    const data = await Order.aggregate([
+      { $unwind: "$items" },
+      { $lookup: { from: "products", localField: "items.product", foreignField: "_id", as: "prod" } },
+      { $unwind: "$prod" },
+      { $group: {
+        _id: "$prod.region",
+        units: { $sum: "$items.quantity" },
+        revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+        orders: { $sum: 1 },
+      }},
+      { $match: { _id: { $nin: [null, ""] } } },
+      { $sort: { units: -1 } },
+      { $limit: 6 },
+    ]);
+    res.json({ success: true, leaderboard: data });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };

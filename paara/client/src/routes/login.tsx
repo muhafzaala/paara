@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
-import { Nav } from "@/components/site/Nav";
-import { Footer } from "@/components/site/Footer";
+import { Loader2, Mail, Lock, ShieldCheck, Smartphone, ArrowRight, RotateCcw } from "lucide-react";
+import badshahiImg from "@/assets/cities/Badshahi.jpg";
+import { PaaraLogo } from "@/components/site/PaaraLogo";
 import { authApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
@@ -12,10 +12,12 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+type Stage = "creds" | "otp" | "totp";
+
 function LoginPage() {
   const navigate = useNavigate();
   const { setUser, setToken, setChallenge } = useAuth() as any;
-  const [stage, setStage] = useState<"creds" | "2fa">("creds");
+  const [stage, setStage] = useState<Stage>("creds");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -23,91 +25,233 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   const submitCreds = async (e: React.FormEvent) => {
-    e.preventDefault(); setBusy(true);
+    e.preventDefault();
+    setBusy(true);
     try {
       const r = await authApi.login(email, password);
-      if (r.data.twoFactor) {
-        setLocalChallenge(r.data.challengeToken);
-        setChallenge?.(r.data.challengeToken);
-        setStage("2fa");
-        toast.success("Check your console / inbox for the OTP code");
+      const { twoFactor, stage: twoFAStage, challengeToken } = r.data;
+
+      if (twoFactor) {
+        setLocalChallenge(challengeToken);
+        setChallenge?.(challengeToken);
+        setStage(twoFAStage === "totp" ? "totp" : "otp");
+        toast.success(twoFAStage === "totp" ? "Enter your authenticator code" : "Check your terminal for the OTP code");
       } else {
-        setToken(r.data.token); setUser(r.data.user);
+        setToken(r.data.token);
+        setUser(r.data.user);
         toast.success("Welcome back");
+        sessionStorage.setItem("paara_just_signed_in", "1");
         const role = r.data.user?.role;
-        if (role === "seller") navigate({ to: "/seller" });
+        if (role === "admin") navigate({ to: "/admin" });
+        else if (role === "seller") navigate({ to: "/seller" });
         else navigate({ to: "/" });
       }
-    } catch (err: any) { toast.error(err.response?.data?.message || "Login failed"); }
-    finally { setBusy(false); }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Login failed");
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const submit2FA = async (e: React.FormEvent) => {
-    e.preventDefault(); setBusy(true);
+  const submitOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
     try {
       const r = await authApi.verifyAdmin2FA(challenge, code);
-      setToken(r.data.token); setUser(r.data.user); setChallenge?.(null);
+      setToken(r.data.token);
+      setUser(r.data.user);
+      setChallenge?.(null);
       toast.success("Verified");
-      navigate({ to: "/admin" });
-    } catch (err: any) { toast.error(err.response?.data?.message || "Invalid code"); }
-    finally { setBusy(false); }
+      if (r.data.mustSetupTOTP) {
+        navigate({ to: "/admin/setup-2fa" });
+      } else {
+        navigate({ to: "/admin" });
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Invalid code");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitTOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const r = await authApi.verifyAdminTOTP(challenge, code);
+      setToken(r.data.token);
+      setUser(r.data.user);
+      setChallenge?.(null);
+      toast.success("Verified");
+      const role = r.data.user?.role;
+      if (role === "admin") navigate({ to: "/admin" });
+      else if (role === "seller") navigate({ to: "/seller" });
+      else navigate({ to: "/" });
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Invalid authenticator code");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const resend = async () => {
-    try { await authApi.resendOTP(challenge, "admin_2fa"); toast.success("New code sent"); }
-    catch (err: any) { toast.error(err.response?.data?.message || "Could not resend"); }
+    try {
+      await authApi.resendOTP(challenge, "admin_2fa");
+      toast.success("New code sent to terminal");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Could not resend");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5EDD8]">
-      <Nav variant="solid" />
-      <div className="pt-28 pb-20 px-6 grid place-items-center">
-        <div className="w-full max-w-md bg-white rounded-[24px] p-8 border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
-          {stage === "creds" ? (
+    <div className="min-h-screen grid md:grid-cols-[1fr_1.05fr] bg-[#F5EDD8]">
+      {/* ── Left column: form ─────────────────────────────────────────── */}
+      <div className="flex flex-col px-6 sm:px-12 lg:px-20 py-12 lg:py-20 order-2 md:order-1">
+        <Link to="/" className="md:hidden flex items-center gap-3 mb-10">
+          <PaaraLogo height={48} />
+          <span className="font-display text-xl tracking-[0.32em] text-[#1C3A2A]">PAARA</span>
+        </Link>
+
+        <div className="m-auto w-full max-w-md">
+          {stage === "creds" && (
             <>
-              <h1 className="display-serif text-3xl text-[#1C3A2A] mb-2">Welcome back</h1>
-              <p className="text-sm text-[#6B645A] mb-6">Sign in to continue</p>
-              <form onSubmit={submitCreds} className="space-y-4">
-                <div className="relative">
-                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B645A]" />
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email"
-                    className="w-full pl-11 pr-4 py-3 rounded-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] text-sm focus:outline-none focus:border-[#C9921A]" />
-                </div>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B645A]" />
-                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password"
-                    className="w-full pl-11 pr-4 py-3 rounded-full bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] text-sm focus:outline-none focus:border-[#C9921A]" />
-                </div>
-                <button type="submit" disabled={busy} className="btn btn-primary w-full">
-                  {busy ? <Loader2 size={16} className="animate-spin" /> : "Sign in"}
-                </button>
-              </form>
-              <p className="text-xs text-[#6B645A] mt-6 text-center">
-                No account? <Link to="/register" className="text-[#C9921A] font-semibold">Create one</Link>
+              <p className="eyebrow mb-3">Welcome back</p>
+              <h1 className="display-serif text-4xl md:text-5xl text-[#1C3A2A] mb-3 leading-tight">Sign in</h1>
+              <p className="text-[#3D2914] mb-8 leading-relaxed">
+                New here?{" "}
+                <Link to="/register" className="text-[#C9921A] font-medium underline-offset-4 hover:underline">Create an account</Link>.
               </p>
-            </>
-          ) : (
-            <>
-              <ShieldCheck size={32} className="text-[#C9921A] mb-3" />
-              <h1 className="display-serif text-3xl text-[#1C3A2A] mb-2">Two-step verification</h1>
-              <p className="text-sm text-[#6B645A] mb-6">Enter the 6-digit code we just sent.</p>
-              <form onSubmit={submit2FA} className="space-y-4">
-                <input value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required
-                  className="w-full text-center text-3xl tracking-[0.5em] font-mono py-4 rounded-2xl bg-[#FFF8EC] border border-[rgba(28,58,42,0.14)] focus:outline-none focus:border-[#C9921A]"
-                  placeholder="••••••" autoFocus inputMode="numeric" pattern="[0-9]{6}" />
-                <button type="submit" disabled={busy || code.length !== 6} className="btn btn-primary w-full disabled:opacity-50">
-                  {busy ? <Loader2 size={16} className="animate-spin" /> : "Verify"}
+
+              <form className="space-y-4" onSubmit={submitCreds}>
+                <Field label="Email" icon={<Mail size={16} />}>
+                  <input
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    className="paara-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Field>
+                <Field label="Password" icon={<Lock size={16} />}>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Your password"
+                    className="paara-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Field>
+                <button type="submit" disabled={busy} className="btn btn-primary w-full !py-4 mt-2 disabled:opacity-60">
+                  {busy ? <Loader2 size={18} className="animate-spin" /> : <>Sign in <ArrowRight size={16} /></>}
                 </button>
               </form>
-              <div className="flex items-center justify-between mt-4 text-xs">
-                <button type="button" onClick={() => setStage("creds")} className="text-[#6B645A] hover:text-[#1C3A2A]">← Back</button>
-                <button type="button" onClick={resend} className="text-[#C9921A] font-semibold">Resend code</button>
+            </>
+          )}
+
+          {stage === "otp" && (
+            <>
+              <div className="w-14 h-14 rounded-2xl bg-[#1C3A2A] grid place-items-center mb-6">
+                <ShieldCheck size={26} className="text-[#C9921A]" />
               </div>
+              <p className="eyebrow mb-3">Two-step verification</p>
+              <h1 className="display-serif text-4xl md:text-5xl text-[#1C3A2A] mb-3 leading-tight">Check your terminal</h1>
+              <p className="text-[#3D2914] mb-2 leading-relaxed">Enter the 6-digit code printed in your server terminal.</p>
+              <p className="text-xs text-[#C9921A] mb-8">After verifying you'll be prompted to set up an authenticator app.</p>
+
+              <form className="space-y-5" onSubmit={submitOTP}>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[#1C3A2A] mb-2">Verification code</label>
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    maxLength={6}
+                    required
+                    autoFocus
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    className="paara-input !pl-5 text-center text-2xl tracking-[0.4em] font-mono"
+                    placeholder="123456"
+                  />
+                </div>
+                <button type="submit" disabled={busy || code.length !== 6} className="btn btn-primary w-full !py-4 disabled:opacity-60">
+                  {busy ? <Loader2 size={18} className="animate-spin" /> : <>Verify &amp; continue <ArrowRight size={16} /></>}
+                </button>
+                <div className="flex items-center justify-between text-sm">
+                  <button type="button" onClick={() => { setStage("creds"); setCode(""); }} className="text-[#6B645A] hover:text-[#1C3A2A] transition-colors">
+                    ← Back
+                  </button>
+                  <button type="button" onClick={resend} className="inline-flex items-center gap-1.5 text-[#C9921A] hover:underline">
+                    <RotateCcw size={13} /> Resend code
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+
+          {stage === "totp" && (
+            <>
+              <div className="w-14 h-14 rounded-2xl bg-[#1C3A2A] grid place-items-center mb-6">
+                <Smartphone size={26} className="text-[#C9921A]" />
+              </div>
+              <p className="eyebrow mb-3">Authenticator</p>
+              <h1 className="display-serif text-4xl md:text-5xl text-[#1C3A2A] mb-3 leading-tight">Enter your code</h1>
+              <p className="text-[#3D2914] mb-8 leading-relaxed">Open your authenticator app and enter the 6-digit code for PAARA.</p>
+
+              <form className="space-y-5" onSubmit={submitTOTP}>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[#1C3A2A] mb-2">Authenticator code</label>
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    maxLength={6}
+                    required
+                    autoFocus
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    className="paara-input !pl-5 text-center text-2xl tracking-[0.4em] font-mono"
+                    placeholder="123456"
+                  />
+                </div>
+                <button type="submit" disabled={busy || code.length !== 6} className="btn btn-primary w-full !py-4 disabled:opacity-60">
+                  {busy ? <Loader2 size={18} className="animate-spin" /> : <>Verify &amp; continue <ArrowRight size={16} /></>}
+                </button>
+                <div className="text-sm">
+                  <button type="button" onClick={() => { setStage("creds"); setCode(""); }} className="text-[#6B645A] hover:text-[#1C3A2A] transition-colors">
+                    ← Back
+                  </button>
+                </div>
+              </form>
             </>
           )}
         </div>
       </div>
-      <Footer />
+
+      {/* ── Right column: dark hero ────────────────────────────────────── */}
+      <div className="relative hidden md:block overflow-hidden order-1 md:order-2 bg-[#01411C]">
+        <img src={badshahiImg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 hero-zoom" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(1,65,28,0.35)] via-transparent to-[rgba(1,65,28,0.85)]" />
+        <div className="relative h-full flex flex-col justify-between p-12 text-[#F5EDD8]">
+          <Link to="/" className="ml-auto"><PaaraLogo height={120} /></Link>
+          <div>
+            <p className="eyebrow !text-[#C9921A] mb-4">Return to PAARA</p>
+            <h2 className="display-serif text-4xl lg:text-5xl leading-tight max-w-[18ch] mb-4">Where <em className="italic text-[#C9921A]">heritage</em> finds its rightful place.</h2>
+            <p className="urdu text-[#C9921A] text-lg">خوش آمدید</p>
+          </div>
+        </div>
+      </div>
+
+      <style>{`.paara-input { width:100%; background:#FFF8EC; border:1px solid rgba(28,58,42,0.14); border-radius:999px; padding:14px 18px 14px 44px; font-family:var(--font-body); font-size:0.9375rem; color:#1C3A2A; transition:all 250ms; } .paara-input:focus { outline:none; border-color:#C9921A; background:#fff; box-shadow:0 0 0 4px rgba(201,146,26,0.16); } .paara-input::placeholder { color:#9C9285; }`}</style>
+    </div>
+  );
+}
+
+function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-[#1C3A2A] mb-2">{label}</label>
+      <div className="relative"><span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B645A]">{icon}</span>{children}</div>
     </div>
   );
 }

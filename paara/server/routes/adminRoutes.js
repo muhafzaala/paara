@@ -7,8 +7,12 @@ const {
   getSellers, verifySeller,
   getAnalytics, getFullStats,
   getAuditLog, getPlatformStats,
+  getRegionLeaderboard,
 } = require("../controllers/adminController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
+
+// Public routes (no auth)
+router.get("/leaderboard/regions", getRegionLeaderboard);
 
 router.use(protect, adminOnly);
 

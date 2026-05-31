@@ -46,7 +46,7 @@ function WishlistPage() {
           <div className="text-center py-16 bg-white rounded-[20px] border border-[rgba(28,58,42,0.08)]">
             <Heart size={40} className="text-[rgba(28,58,42,0.2)] mx-auto mb-4" />
             <p className="display-serif text-xl text-[#1C3A2A] mb-2">Nothing saved yet</p>
-            <Link to="/products" className="btn btn-primary">Browse the catalogue</Link>
+            <Link to="/products" search={{} as any} className="btn btn-primary">Browse the catalogue</Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -55,13 +55,13 @@ function WishlistPage() {
               if (!p) return null;
               return (
                 <div key={p._id} className="bg-white rounded-[20px] overflow-hidden border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)]">
-                  <Link to="/products/$id" params={{ id: p._id }} className="relative block aspect-[4/3] overflow-hidden">
+                  <Link to="/products/$id" params={{ id: p._id }} search={{} as any} className="relative block aspect-[4/3] overflow-hidden">
                     {p.isDemo && <DemoBadge position="top-left" />}
                     <ProductImage src={p.images?.[0]} alt={p.name} size="md" className="hover:scale-105 transition-transform duration-500" />
                   </Link>
                   <div className="p-4">
                     <p className="eyebrow mb-1">{p.city}</p>
-                    <Link to="/products/$id" params={{ id: p._id }}>
+                    <Link to="/products/$id" params={{ id: p._id }} search={{} as any}>
                       <h3 className="display-serif text-lg text-[#1C3A2A] leading-tight mb-1 hover:text-[#C9921A] transition-colors">{p.name}</h3>
                     </Link>
                     <p className="font-display text-lg font-semibold text-[#C9921A] mb-3">{formatPKR(p.price)}</p>

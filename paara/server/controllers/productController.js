@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const { cloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+const { notifyAllAdmins } = require("../utils/notify");
 
 exports.getProducts = async (req, res) => {
   try {
@@ -56,6 +57,13 @@ exports.getProduct = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const product = await Product.create({ ...req.body, seller: req.user._id });
+    notifyAllAdmins({
+      type: "new_product_submitted",
+      title: "New product submitted",
+      message: `"${product.name}" was submitted for review.`,
+      link: `/admin/products/${product._id}`,
+      metadata: { productId: product._id },
+    });
     res.status(201).json({ success: true, product });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

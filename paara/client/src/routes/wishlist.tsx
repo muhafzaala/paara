@@ -65,7 +65,7 @@ function WishlistPage() {
             <div className="text-center py-20 bg-white rounded-[24px] border border-[rgba(28,58,42,0.08)]">
               <Heart size={48} className="text-[rgba(28,58,42,0.15)] mx-auto mb-6" />
               <h2 className="display-serif text-3xl text-[#1C3A2A] mb-3">Nothing saved yet</h2>
-              <Link to="/products" className="btn btn-primary">Explore the catalogue</Link>
+              <Link to="/products" search={{} as any} className="btn btn-primary">Explore the catalogue</Link>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
@@ -73,12 +73,12 @@ function WishlistPage() {
                 const p = item.product;
                 return (
                   <div key={p._id} className="paara-card">
-                    <Link to="/products/$id" params={{ id: p._id }} className="block">
+                    <Link to="/products/$id" params={{ id: p._id }} search={{} as any} className="block">
                       <div className="img-wrap"><ProductImage src={p.images?.[0]} alt={p.name} size="md" /></div>
                     </Link>
                     <div className="p-5">
                       <p className="eyebrow mb-1">{p.city}</p>
-                      <Link to="/products/$id" params={{ id: p._id }}>
+                      <Link to="/products/$id" params={{ id: p._id }} search={{} as any}>
                         <h3 className="display-serif text-base text-[#1C3A2A] leading-tight mb-2 hover:text-[#C9921A]">{p.name}</h3>
                       </Link>
                       <p className="font-display text-lg text-[#C9921A] font-semibold mb-3">{formatPKR(p.price)}</p>

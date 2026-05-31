@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const AdminRequest = require("../models/AdminRequest");
+const { notifyUser, notifyAllAdmins } = require("../utils/notify");
 
 // POST /api/v1/admin-requests  (any logged-in user)
 exports.submitRequest = async (req, res) => {
@@ -15,9 +16,21 @@ exports.submitRequest = async (req, res) => {
     if (existing) {
       existing.reason = reason; existing.status = "pending"; existing.reviewedBy = undefined; existing.reviewedAt = undefined;
       await existing.save();
+      notifyAllAdmins({
+        type: "admin_request_submitted",
+        title: "Admin access re-requested",
+        message: `${req.user.name} resubmitted an admin access request.`,
+        link: "/admin/admin-requests",
+      });
       return res.json({ success: true, request: existing });
     }
     const r = await AdminRequest.create({ user: req.user._id, reason });
+    notifyAllAdmins({
+      type: "admin_request_submitted",
+      title: "New admin access request",
+      message: `${req.user.name} has requested admin access.`,
+      link: "/admin/admin-requests",
+    });
     res.json({ success: true, request: r });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };
@@ -63,6 +76,15 @@ exports.reviewRequest = async (req, res) => {
       r.status = "rejected";
     }
     await r.save();
+    notifyUser(r.user, {
+      type: "admin_request_reviewed",
+      title: action === "approve" ? "Admin access approved" : "Admin access request rejected",
+      message: action === "approve"
+        ? "Your admin access request has been approved. You now have admin privileges."
+        : `Your admin access request was not approved${notes ? `: ${notes}` : "."}`,
+      link: "/account",
+      metadata: { action },
+    });
     res.json({ success: true, request: r });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import RegionalCelebration from "@/components/celebrations/RegionalCelebration";
+import OrderReceipt from "@/components/checkout/OrderReceipt";
 import { Check, ArrowRight, ArrowLeft, Wallet, Smartphone, Banknote, Truck, ShieldCheck, Loader2, CreditCard, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import { Nav } from "@/components/site/Nav";
@@ -34,6 +35,7 @@ function CheckoutPage() {
   const [celebrating, setCelebrating] = useState(false);
   const [celebRegion, setCelebRegion] = useState<string | undefined>(undefined);
   const [celebCity, setCelebCity] = useState<string | undefined>(undefined);
+  const [receiptItems, setReceiptItems] = useState<typeof items>([]);
 
   useEffect(() => {
     if (!user) navigate({ to: "/login" });
@@ -69,6 +71,7 @@ function CheckoutPage() {
       } else {
         setOrderId(`PAARA-${Date.now().toString(36).toUpperCase()}`);
       }
+      setReceiptItems([...itemsSnapshot]);
       setStep(2);
       clear();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -99,7 +102,28 @@ function CheckoutPage() {
         <div className="mx-auto max-w-[1200px]">
           <Stepper step={step} />
           {step === 2 ? (
-            <Confirmation orderId={orderId} navigate={navigate} />
+            <>
+              {receiptItems.length > 0 && (
+                <div className="mt-10">
+                  <OrderReceipt
+                    orderId={orderId}
+                    items={receiptItems.map((i) => ({
+                      name: (i.product as any).name,
+                      quantity: i.quantity,
+                      price: (i.product as any).price,
+                      image: (i.product as any).img,
+                    }))}
+                    shipping={shipping}
+                    payment={{ method: payment }}
+                    pricing={{ subtotal, shipping: shippingFee, total }}
+                    placedAt={new Date()}
+                    onTrackOrder={() => navigate({ to: "/account/orders" })}
+                    onContinueShopping={() => navigate({ to: "/products", search: {} as any })}
+                  />
+                </div>
+              )}
+              <Confirmation orderId={orderId} navigate={navigate} />
+            </>
           ) : (
             <div className="grid lg:grid-cols-[1fr_380px] gap-10 mt-10">
               <div>

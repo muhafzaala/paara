@@ -34,10 +34,10 @@ function ProfilePage() {
       </header>
 
       <form onSubmit={handleSave} className="bg-white rounded-[20px] p-6 md:p-8 shadow-[var(--shadow-soft)] border border-[rgba(28,58,42,0.08)] space-y-5 max-w-lg">
-        <Field label="Full name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+        <Field label="Full name" value={form.name} onChange={(v: string) => setForm({ ...form, name: v })} />
         <Field label="Email" value={user?.email || ""} onChange={() => {}} disabled hint="Email cannot be changed" />
-        <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+92 3xx xxxxxxx" />
-        <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} placeholder="Lahore, Karachi…" />
+        <Field label="Phone" value={form.phone} onChange={(v: string) => setForm({ ...form, phone: v })} placeholder="+92 3xx xxxxxxx" />
+        <Field label="City" value={form.city} onChange={(v: string) => setForm({ ...form, city: v })} placeholder="Lahore, Karachi…" />
 
         <div className="pt-2">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#1C3A2A] mb-2">Account type</p>

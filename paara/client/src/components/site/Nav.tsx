@@ -20,7 +20,10 @@ export function Nav({ variant = "transparent" }: NavProps) {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [navVisible, setNavVisible] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openRef = useRef({ mobileOpen, searchOpen, avatarOpen });
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, logout } = useAuth();
   const cartItems = useCart((s) => s.items);
@@ -33,6 +36,32 @@ export function Nav({ variant = "transparent" }: NavProps) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [variant]);
+
+  // Keep ref in sync so the mousemove handler always sees current overlay state
+  useEffect(() => { openRef.current = { mobileOpen, searchOpen, avatarOpen }; },
+    [mobileOpen, searchOpen, avatarOpen]);
+
+  // Auto-hide: hide after 3 s when cursor leaves the top 80 px; reveal on hover near top
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (openRef.current.mobileOpen || openRef.current.searchOpen || openRef.current.avatarOpen) {
+        setNavVisible(true);
+        return;
+      }
+      if (e.clientY < 80) {
+        setNavVisible(true);
+        if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      } else {
+        if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = setTimeout(() => setNavVisible(false), 3000);
+      }
+    };
+    window.addEventListener("mousemove", handle, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handle);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, []);
 
   const { t } = useLang();
   const links = [
@@ -74,9 +103,14 @@ export function Nav({ variant = "transparent" }: NavProps) {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: scrolled ? "rgba(28, 58, 42, 0.92)" : "transparent",
+        background: scrolled
+          ? "rgba(28, 58, 42, 0.92)"
+          : "linear-gradient(to bottom, rgba(15,34,25,0.55) 0%, transparent 100%)",
         backdropFilter: scrolled ? "blur(20px) saturate(1.2)" : "none",
         borderBottom: scrolled ? "1px solid rgba(201,146,26,0.20)" : "1px solid transparent",
+        transform: navVisible ? "translateY(0)" : "translateY(-100%)",
+        opacity: navVisible ? 1 : 0,
+        pointerEvents: navVisible ? "auto" : "none",
       }}
     >
       <div className="mx-auto max-w-[1400px] flex items-center justify-between px-6 lg:px-12 py-4">

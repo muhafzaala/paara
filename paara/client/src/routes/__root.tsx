@@ -1,5 +1,11 @@
 import { QueryClient } from "@tanstack/react-query";
 import { Outlet, Link, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
+import { CraftAssistant } from "@/components/site/CraftAssistant";
+import { CompareBar } from "@/components/CompareBar";
+import { SurpriseMe } from "@/components/SurpriseMe";
+import RegionalWelcome from "@/components/celebrations/RegionalWelcome";
+import TruckArtEgg from "@/components/easter-eggs/TruckArtEgg";
+import PageTransition from "@/components/ui/PageTransition";
 
 function NotFoundComponent() {
   return (
@@ -39,8 +45,21 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+function RootLayout() {
+  return (
+    <>
+      <PageTransition><Outlet /></PageTransition>
+      <CraftAssistant />
+      <CompareBar />
+      <SurpriseMe />
+      <RegionalWelcome />
+      <TruckArtEgg />
+    </>
+  );
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  component: () => <Outlet />,
+  component: RootLayout,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });

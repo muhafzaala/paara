@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Clock, FileSearch, MapPin, Award, X, Loader2, ArrowLeft } from "lucide-react";
+import { Check, Clock, FileSearch, MapPin, Award, X, Loader2, ArrowLeft, RefreshCw, MessageSquare } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { sellerApi } from "@/lib/api";
@@ -19,7 +19,7 @@ const STAGES = [
 
 const STATUS_TO_INDEX: Record<string, number> = {
   "none": -1, "applied": 0, "documents_under_review": 1,
-  "field_visit_scheduled": 2, "approved": 3, "rejected": -2,
+  "field_visit_scheduled": 2, "approved": 3, "rejected": -2, "reapply_requested": -3,
 };
 
 function StatusPage() {
@@ -37,9 +37,12 @@ function StatusPage() {
   }
 
   const profile = data;
-  const currentIndex = STATUS_TO_INDEX[profile?.verificationStatus] ?? -1;
-  const isRejected = profile?.verificationStatus === "rejected";
-  const isUnapplied = profile?.verificationStatus === "none" || !profile?.verificationStatus;
+  const status = profile?.verificationStatus;
+  const currentIndex = STATUS_TO_INDEX[status] ?? -1;
+  const isRejected = status === "rejected";
+  const isReapplyRequested = status === "reapply_requested";
+  const isUnapplied = status === "none" || !status;
+  const isInProgress = !isUnapplied && !isRejected && !isReapplyRequested;
 
   return (
     <div className="min-h-screen bg-[#F5EDD8]">
@@ -70,14 +73,37 @@ function StatusPage() {
             <div className="bg-white rounded-[24px] p-10 text-center border border-[rgba(139,26,26,0.16)] shadow-[var(--shadow-soft)]">
               <X size={40} className="mx-auto text-[#8B1A1A] mb-4" />
               <h2 className="display-serif text-2xl text-[#1C3A2A] mb-2">Application not approved</h2>
-              {profile.rejectionReason && (
-                <p className="text-sm text-[#6B645A] mb-6">Reason: {profile.rejectionReason}</p>
+              {(profile.rejectionReason || profile.adminNotes) && (
+                <div className="max-w-sm mx-auto mb-6 bg-[#FFF3CD] border border-[rgba(139,26,26,0.15)] rounded-2xl p-4 text-left">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#8B1A1A] mb-1">Reason</p>
+                  <p className="text-sm text-[#3D2914]">{profile.rejectionReason || profile.adminNotes}</p>
+                </div>
               )}
-              <p className="text-xs text-[#6B645A]">You can update your application and resubmit.</p>
+              <p className="text-xs text-[#6B645A] mb-6">If you believe this was a mistake, you may contact PAARA support.</p>
+              <Link to="/seller/onboarding" className="btn btn-primary inline-flex items-center gap-2">
+                <RefreshCw size={14} /> Update and resubmit
+              </Link>
             </div>
           )}
 
-          {!isUnapplied && !isRejected && (
+          {isReapplyRequested && (
+            <div className="bg-white rounded-[24px] p-10 text-center border border-[rgba(201,146,26,0.3)] shadow-[var(--shadow-soft)]">
+              <MessageSquare size={40} className="mx-auto text-[#C9921A] mb-4" />
+              <h2 className="display-serif text-2xl text-[#1C3A2A] mb-2">Admin requested updates</h2>
+              <p className="text-sm text-[#6B645A] mb-4">Our team reviewed your application and has some feedback. Please update your information and resubmit.</p>
+              {profile.adminNotes && (
+                <div className="max-w-md mx-auto mb-6 bg-[#FFF8EC] border border-[rgba(201,146,26,0.3)] rounded-2xl p-4 text-left">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C9921A] mb-2">Feedback from admin</p>
+                  <p className="text-sm text-[#3D2914] leading-relaxed">{profile.adminNotes}</p>
+                </div>
+              )}
+              <Link to="/seller/onboarding" className="btn btn-primary inline-flex items-center gap-2">
+                <RefreshCw size={14} /> Update my application
+              </Link>
+            </div>
+          )}
+
+          {isInProgress && (
             <ol className="bg-white rounded-[24px] p-6 md:p-10 border border-[rgba(28,58,42,0.08)] shadow-[var(--shadow-soft)] space-y-5">
               {STAGES.map((stage, i) => {
                 const reached = currentIndex >= i;

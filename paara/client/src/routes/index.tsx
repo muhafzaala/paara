@@ -81,7 +81,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#F5EDD8]">
-      <Nav />
+      <Nav variant="solid" />
       <WelcomeBanner />
 
       {/* HERO */}

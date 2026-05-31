@@ -98,7 +98,7 @@ function CartPage() {
           <ShoppingBag size={56} className="text-[rgba(28,58,42,0.18)] mx-auto mb-6" />
           <h1 className="display-serif text-3xl text-[#1C3A2A] mb-3">Your cart is empty</h1>
           <p className="text-[#6B645A] mb-8 leading-relaxed">Browse our catalogue of handcrafted Pakistani heritage pieces.</p>
-          <Link to="/products" className="btn btn-primary">Explore the catalogue</Link>
+          <Link to="/products" search={{} as any} className="btn btn-primary">Explore the catalogue</Link>
         </div>
       </main>
       <Footer />
@@ -127,15 +127,15 @@ function CartPage() {
                 const img = p.img || p.images?.[0];
                 return (
                   <div key={p.id} className="bg-white rounded-[20px] p-5 flex gap-5 shadow-[var(--shadow-soft)] border border-[rgba(28,58,42,0.06)]">
-                    <Link to="/products/$id" params={{ id: p.id }} className="relative flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-[14px] overflow-hidden bg-[#FFF8EC]">
-                      {p.isDemo && <DemoBadge position="top-left" size="sm" />}
+                    <Link to="/products/$id" params={{ id: p.id }} search={{} as any} className="relative flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-[14px] overflow-hidden bg-[#FFF8EC]">
+                      {(p as any).isDemo && <DemoBadge position="top-left" size="sm" />}
                       <ProductImage src={img} alt={p.name} size="sm" className="hover:scale-105 transition-transform duration-500" />
                     </Link>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="eyebrow mb-1">{p.region || p.city}</p>
-                          <Link to="/products/$id" params={{ id: p.id }}>
+                          <Link to="/products/$id" params={{ id: p.id }} search={{} as any}>
                             <h3 className="display-serif text-lg text-[#1C3A2A] leading-tight hover:text-[#C9921A] transition-colors">{p.name}</h3>
                           </Link>
                           {(p.artisan || p.material) && <p className="text-xs text-[#6B645A] mt-0.5">{[p.artisan, p.material].filter(Boolean).join(" · ")}</p>}

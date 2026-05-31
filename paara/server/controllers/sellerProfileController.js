@@ -3,6 +3,7 @@ const SellerProfile = require("../models/SellerProfile");
 const Product       = require("../models/Product");
 const Order         = require("../models/Order");
 const Review        = require("../models/Review");
+const { notifyUser } = require("../utils/notify");
 
 // Helper — fetch or auto-create empty profile (for sellers who registered before migration)
 async function ensureProfile(userId) {
@@ -60,6 +61,7 @@ exports.getPublicSellerProfile = async (req, res) => {
         verificationStatus: profile.verificationStatus,
         heritageBadges: profile.heritageBadges,
         memberSince: seller.createdAt,
+        accentColor: profile.accentColor || "#C9921A",
       },
       products,
       stats: {
@@ -120,7 +122,8 @@ exports.getSellerDashboard = async (req, res) => {
 // GET /api/v1/seller/analytics  (seller)
 exports.getSellerAnalytics = async (req, res) => {
   try {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const days = Number(req.query.days) || 30;
+    const thirtyDaysAgo = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     const [revenueData, topProducts, categoryBreakdown] = await Promise.all([
       Order.aggregate([
@@ -205,17 +208,26 @@ exports.updateMyProfile = async (req, res) => {
     const ALLOWED = [
       "shopName", "shopDescription", "shopBanner", "shopLogo", "yearEstablished",
       "shopStory", "city", "region", "craftSpecialties", "languagesSpoken", "isVisible",
+      "phone", "cnicNumber", "address", "accentColor",
     ];
     for (const field of ALLOWED) {
       if (req.body[field] !== undefined) profile[field] = req.body[field];
     }
     // Bank details are nested
     if (req.body.bank) {
-      profile.bank = { ...profile.bank, ...req.body.bank };
+      profile.bank = { ...profile.bank?.toObject?.() || profile.bank || {}, ...req.body.bank };
+    }
+    // Mobile pay is nested
+    if (req.body.mobilePay) {
+      profile.mobilePay = { ...profile.mobilePay?.toObject?.() || profile.mobilePay || {}, ...req.body.mobilePay };
+    }
+    // Social links are nested
+    if (req.body.socialLinks) {
+      profile.socialLinks = { ...profile.socialLinks?.toObject?.() || profile.socialLinks || {}, ...req.body.socialLinks };
     }
     // Documents are nested
     if (req.body.documents) {
-      profile.documents = { ...profile.documents, ...req.body.documents };
+      profile.documents = { ...profile.documents?.toObject?.() || profile.documents || {}, ...req.body.documents };
     }
 
     await profile.save();
@@ -248,13 +260,15 @@ exports.submitApplication = async (req, res) => {
       });
     }
 
+    const isReapply = profile.verificationStatus === "reapply_requested";
     // Transition to applied
     profile.verificationStatus = "applied";
     profile.verificationStage = 1;
     profile.appliedAt = new Date();
+    profile.adminNotes = ""; // clear previous admin notes on resubmission
     profile.verificationHistory.push({
       stage: "applied",
-      notes: "Seller submitted onboarding application.",
+      notes: isReapply ? "Seller resubmitted application after update request." : "Seller submitted onboarding application.",
       by: req.user._id,
       at: new Date(),
     });
@@ -274,13 +288,13 @@ exports.submitApplication = async (req, res) => {
 exports.advanceVerification = async (req, res) => {
   try {
     const { stage, notes } = req.body;
-    const VALID = ["applied", "documents_under_review", "field_visit_scheduled", "approved", "rejected"];
+    const VALID = ["applied", "documents_under_review", "field_visit_scheduled", "approved", "rejected", "reapply_requested"];
     if (!VALID.includes(stage)) return res.status(400).json({ success: false, message: "Invalid stage" });
 
     const profile = await SellerProfile.findById(req.params.id);
     if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
 
-    const STAGE_IDX = { applied: 1, documents_under_review: 2, field_visit_scheduled: 3, approved: 4, rejected: 0 };
+    const STAGE_IDX = { applied: 1, documents_under_review: 2, field_visit_scheduled: 3, approved: 4, rejected: 0, reapply_requested: 0 };
     profile.verificationStatus = stage;
     profile.verificationStage = STAGE_IDX[stage];
     if (stage === "approved") {
@@ -291,7 +305,43 @@ exports.advanceVerification = async (req, res) => {
       profile.rejectedAt = new Date();
       profile.rejectionReason = notes || "Not specified";
     }
+    profile.adminNotes = notes || "";
     profile.verificationHistory.push({ stage, notes: notes || "", by: req.user._id, at: new Date() });
+    await profile.save();
+
+    const stageMessages = {
+      approved: "Congratulations! Your seller profile has been approved.",
+      rejected: `Your seller verification was rejected${notes ? `: ${notes}` : "."}`,
+      reapply_requested: `Please update your profile and reapply${notes ? `: ${notes}` : "."}`,
+      documents_under_review: "Your documents are under review. We'll update you soon.",
+      field_visit_scheduled: "A field visit has been scheduled. Check your email for details.",
+      applied: "Your verification application has been received.",
+    };
+    notifyUser(profile.user, {
+      type: "verification_update",
+      title: "Verification status updated",
+      message: stageMessages[stage] || `Your verification status is now: ${stage}.`,
+      link: "/seller/profile",
+      metadata: { stage },
+    });
+
+    res.json({ success: true, profile });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+};
+
+// PATCH /api/v1/admin/seller-profiles/:id/request-info  (admin)
+exports.requestMoreInfo = async (req, res) => {
+  try {
+    const { notes } = req.body;
+    if (!notes || !notes.trim()) return res.status(400).json({ success: false, message: "Notes are required when requesting more info" });
+
+    const profile = await SellerProfile.findById(req.params.id);
+    if (!profile) return res.status(404).json({ success: false, message: "Profile not found" });
+
+    profile.verificationStatus = "reapply_requested";
+    profile.verificationStage = 0;
+    profile.adminNotes = notes.trim();
+    profile.verificationHistory.push({ stage: "reapply_requested", notes: notes.trim(), by: req.user._id, at: new Date() });
     await profile.save();
     res.json({ success: true, profile });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }

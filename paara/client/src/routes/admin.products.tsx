@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, XCircle, AlertTriangle, Loader2, Package } from "lucide-react";
+import { CheckCircle2, XCircle, Trash2, Loader2, Package } from "lucide-react";
 import { formatPKR } from "@/lib/products";
 import { adminApi } from "@/lib/api";
 import { toast } from "sonner";
@@ -55,11 +55,22 @@ function AdminProducts() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {acting === p._id ? <Loader2 size={16} className="animate-spin text-[#C9921A]" /> : (
-                    <>
-                      <button onClick={() => moderate(p._id, "approve")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Approve"><CheckCircle2 size={18} /></button>
-                      <button onClick={() => moderate(p._id, "reject")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
-                      <button onClick={() => moderate(p._id, "suspend")} className="p-2 rounded-full hover:bg-[rgba(201,146,26,0.2)] text-[#C9921A]" title="Suspend"><AlertTriangle size={18} /></button>
-                    </>
+                    p.status === "approved" ? (
+                      <>
+                        <button type="button" onClick={() => moderate(p._id, "reject")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
+                        <button type="button" onClick={() => moderate(p._id, "remove")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-300" title="Remove"><Trash2 size={18} /></button>
+                      </>
+                    ) : p.status === "rejected" ? (
+                      <>
+                        <button type="button" onClick={() => moderate(p._id, "approve")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Re-approve"><CheckCircle2 size={18} /></button>
+                        <button type="button" onClick={() => moderate(p._id, "remove")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-300" title="Remove"><Trash2 size={18} /></button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => moderate(p._id, "approve")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Approve"><CheckCircle2 size={18} /></button>
+                        <button type="button" onClick={() => moderate(p._id, "reject")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
+                      </>
+                    )
                   )}
                 </div>
               </div>

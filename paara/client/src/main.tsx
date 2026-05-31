@@ -1,5 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
+// Initialize theme before first paint
+try {
+  const t = localStorage.getItem("paara_theme") || "cream";
+  document.documentElement.dataset.theme = t;
+} catch {}
 import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";

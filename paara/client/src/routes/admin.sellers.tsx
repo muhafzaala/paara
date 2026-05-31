@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, XCircle, Trash2, Loader2 } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -21,6 +21,13 @@ function AdminSellers() {
     setActing(id);
     try { await adminApi.verifySeller(id, status); qc.invalidateQueries({ queryKey: ["admin-sellers"] }); toast.success(`Seller ${status}`); }
     catch { toast.error("Could not update seller"); } finally { setActing(null); }
+  };
+
+  const removeSeller = async (id: string) => {
+    if (!window.confirm("Permanently remove this seller? This cannot be undone.")) return;
+    setActing(id);
+    try { await adminApi.deleteUser(id); qc.invalidateQueries({ queryKey: ["admin-sellers"] }); toast.success("Seller removed"); }
+    catch { toast.error("Could not remove seller"); } finally { setActing(null); }
   };
 
   const BADGE_STYLES: Record<string, string> = { approved: "text-green-400", pending: "text-amber-400", rejected: "text-red-400", none: "text-gray-400" };
@@ -57,10 +64,22 @@ function AdminSellers() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   {acting === s._id ? <Loader2 size={16} className="animate-spin text-[#C9921A]" /> : (
-                    <>
-                      <button onClick={() => verify(s._id, "approved")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Approve"><CheckCircle2 size={18} /></button>
-                      <button onClick={() => verify(s._id, "rejected")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
-                    </>
+                    s.verificationStatus === "approved" ? (
+                      <>
+                        <button type="button" onClick={() => verify(s._id, "rejected")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
+                        <button type="button" onClick={() => removeSeller(s._id)} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-300" title="Remove"><Trash2 size={18} /></button>
+                      </>
+                    ) : s.verificationStatus === "rejected" ? (
+                      <>
+                        <button type="button" onClick={() => verify(s._id, "approved")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Re-approve"><CheckCircle2 size={18} /></button>
+                        <button type="button" onClick={() => removeSeller(s._id)} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-300" title="Remove"><Trash2 size={18} /></button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => verify(s._id, "approved")} className="p-2 rounded-full hover:bg-[rgba(42,92,63,0.3)] text-green-400" title="Approve"><CheckCircle2 size={18} /></button>
+                        <button type="button" onClick={() => verify(s._id, "rejected")} className="p-2 rounded-full hover:bg-[rgba(139,26,26,0.3)] text-red-400" title="Reject"><XCircle size={18} /></button>
+                      </>
+                    )
                   )}
                 </div>
               </div>

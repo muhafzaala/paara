@@ -28,7 +28,7 @@ const sellerProfileSchema = new mongoose.Schema({
   // ─── Verification pipeline (4 stages) ──────────
   verificationStatus: {
     type: String,
-    enum: ["none", "applied", "documents_under_review", "field_visit_scheduled", "approved", "rejected"],
+    enum: ["none", "applied", "documents_under_review", "field_visit_scheduled", "approved", "rejected", "reapply_requested"],
     default: "none",
     index: true,
   },
@@ -43,6 +43,7 @@ const sellerProfileSchema = new mongoose.Schema({
   approvedAt: Date,
   rejectedAt: Date,
   rejectionReason: String,
+  adminNotes: String, // latest message from admin (rejection reason or reapply request notes)
 
   // ─── Identity documents (Cloudinary URLs) ──────
   documents: {
@@ -50,6 +51,25 @@ const sellerProfileSchema = new mongoose.Schema({
     cnicBack: { type: String, default: "" },
     workshopPhotos: [String], // 3-5 photos of workshop / tools
     craftPhotos: [String],    // photos of finished pieces / work-in-progress
+  },
+
+  // ─── Personal / contact info ───────────────────
+  phone: { type: String, trim: true },
+  cnicNumber: { type: String, trim: true },
+  address: { type: String, trim: true, maxlength: 500 },
+
+  // ─── Social media links ─────────────────────────
+  socialLinks: {
+    instagram: { type: String, default: "" },
+    facebook: { type: String, default: "" },
+    tiktok: { type: String, default: "" },
+    website: { type: String, default: "" },
+  },
+
+  // ─── Mobile money payouts ───────────────────────
+  mobilePay: {
+    easypaisa: { type: String, default: "" },
+    jazzcash: { type: String, default: "" },
   },
 
   // ─── Bank details for payouts ──────────────────
@@ -75,6 +95,9 @@ const sellerProfileSchema = new mongoose.Schema({
   // ─── Status flags ──────────────────────────────
   isActive: { type: Boolean, default: true },
   isVisible: { type: Boolean, default: true }, // public profile visibility toggle
+
+  // ─── Accent color for storefront theme ──────────
+  accentColor: { type: String, default: "#C9921A" },
 }, {
   timestamps: true,
 });

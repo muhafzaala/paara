@@ -1,6 +1,6 @@
 const express = require("express");
 const router  = express.Router();
-const { register, login, getMe, logout, forgotPassword, resetPassword, verifyEmailOtp, resendEmailOtp, verify2FA: verifyAdmin2FA, resendOTP, requestOTP, verifyGenericOTP } = require("../controllers/authController");
+const { register, login, getMe, logout, forgotPassword, resetPassword, verifyEmailOtp, resendEmailOtp, verify2FA: verifyAdmin2FA, verifyAdminTOTP, resendOTP, requestOTP, verifyGenericOTP } = require("../controllers/authController");
 const { setup2FA, verify2FA, disable2FA, validate2FA } = require("../controllers/twoFactorController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -15,7 +15,8 @@ router.post("/forgot-password",     forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 // Admin 2FA challenge (unauthenticated — uses challengeToken)
-router.post("/verify-2fa",   verifyAdmin2FA);
+router.post("/verify-2fa",   verifyAdmin2FA);   // OTP path
+router.post("/verify-totp",  verifyAdminTOTP);  // Authenticator app path
 router.post("/resend-otp",   resendOTP);
 
 // Authenticated OTP (email verify, etc.)

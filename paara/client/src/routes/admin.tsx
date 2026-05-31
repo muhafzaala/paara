@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Store, Users, BarChart3, Settings, LogOut, Menu, X, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Package, Store, Users, BarChart3, Settings, LogOut, Menu, X, ShieldCheck, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth, useHasHydrated } from "@/lib/auth-store";
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/admin/sellers" as const, label: "Sellers", icon: Store },
   { to: "/admin/users" as const, label: "Users", icon: Users },
   { to: "/admin/analytics" as const, label: "Analytics", icon: BarChart3 },
+  { to: "/admin/admins" as const, label: "Admin Mgmt", icon: Crown },
   { to: "/admin/settings" as const, label: "Settings", icon: Settings },
 ];
 
@@ -23,11 +24,17 @@ function AdminLayout() {
 
   useEffect(() => {
     if (!hasHydrated) return;
-    if (!user) navigate({ to: "/login" });
-    else if (user.role !== "admin") navigate({ to: "/" });
-  }, [user, navigate, hasHydrated]);
+    if (!user) { navigate({ to: "/login" }); return; }
+    if (user.role !== "admin") { navigate({ to: "/" }); return; }
+    // Enforce TOTP setup for admins who haven't configured it yet
+    if (user.twoFactorRequired && !user.twoFactorEnabled && loc.pathname !== "/admin/setup-2fa") {
+      navigate({ to: "/admin/setup-2fa" });
+    }
+  }, [user, navigate, hasHydrated, loc.pathname]);
 
   if (!hasHydrated || !user || user.role !== "admin") return null;
+  // Block rendering admin UI until TOTP is set up
+  if (user.twoFactorRequired && !user.twoFactorEnabled && loc.pathname !== "/admin/setup-2fa") return null;
 
   return (
     <div className="min-h-screen bg-[#0F2219]">

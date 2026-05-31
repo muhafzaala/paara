@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Share2, Truck, Shield, RotateCcw, ChevronDown, Plus, Minus, ArrowRight, Check, Loader2, Star, MessageCircle } from "lucide-react";
+import { Heart, Share2, Truck, Shield, RotateCcw, ChevronDown, Plus, Minus, ArrowRight, Check, Loader2, Star, MessageCircle, SlidersHorizontal } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { getProduct, formatPKR } from "@/lib/products";
@@ -10,6 +10,15 @@ import { productsApi, reviewsApi, cartApi, wishlistApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { toast } from "sonner";
 import ProductImage from "@/components/ProductImage";
+import DemoBadge from "@/components/DemoBadge";
+import ProductImageZoom from "@/components/ProductImageZoom";
+import { addRecentlyViewed } from "@/lib/recently-viewed";
+import RecentlyViewed from "@/components/RecentlyViewed";
+import { useCompare } from "@/lib/compare-store";
+import StickyBuyBar from "@/components/StickyBuyBar";
+import MadeInStamp from "@/components/MadeInStamp";
+import MiniOriginMap from "@/components/MiniOriginMap";
+import { useCurrency, formatPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/products/$id")({
   component: ProductDetailPage,
@@ -26,6 +35,9 @@ function ProductDetailPage() {
   const [adding, setAdding] = useState(false);
   const [question, setQuestion] = useState("");
   const [askingQ, setAskingQ] = useState(false);
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const [showSticky, setShowSticky] = useState(false);
+  const [currency] = useCurrency();
 
   // Fetch from API; fallback to local mock
   const { data: apiProduct, isLoading } = useQuery({
@@ -47,6 +59,26 @@ function ProductDetailPage() {
       } catch { return []; }
     },
   });
+
+  useEffect(() => {
+    let raf: number;
+    const onScroll = () => { raf = requestAnimationFrame(() => setShowSticky(window.scrollY > 260)); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
+  // Track recently viewed when product loads
+  useEffect(() => {
+    if (apiProduct) {
+      addRecentlyViewed({
+        _id: apiProduct._id,
+        name: apiProduct.name,
+        price: apiProduct.price,
+        images: apiProduct.images,
+        city: apiProduct.city,
+      });
+    }
+  }, [apiProduct]);
 
   // Use API data or fallback to local mock
   const mockProduct = getProduct(id);
@@ -100,7 +132,7 @@ function ProductDetailPage() {
     <div className="min-h-screen bg-[#F5EDD8] grid place-items-center">
       <div className="text-center">
         <h2 className="display-serif text-3xl text-[#1C3A2A] mb-4">Product not found</h2>
-        <Link to="/products" className="btn btn-primary">Browse the catalogue</Link>
+        <Link to="/products" search={{} as any} className="btn btn-primary">Browse the catalogue</Link>
       </div>
     </div>
   );
@@ -124,11 +156,18 @@ function ProductDetailPage() {
 
   const handleWishlist = async () => {
     if (!user) { toast.error("Sign in to save to wishlist"); navigate({ to: "/login" }); return; }
+    if (!apiProduct) { toast.info("Wishlist is available for catalogue products."); return; }
     try {
-      await wishlistApi.add(p._id);
-      setWishlisted(true);
-      toast.success("Saved to wishlist");
-    } catch { toast.error("Could not add to wishlist"); }
+      if (wishlisted) {
+        await wishlistApi.remove(p._id);
+        setWishlisted(false);
+        toast.success("Removed from wishlist");
+      } else {
+        await wishlistApi.add(p._id);
+        setWishlisted(true);
+        toast.success("Saved to wishlist");
+      }
+    } catch { toast.error("Could not update wishlist"); }
   };
 
   const handleAskQuestion = async (e: React.FormEvent) => {
@@ -152,32 +191,24 @@ function ProductDetailPage() {
         <div className="mx-auto max-w-[1280px]">
           <nav className="flex items-center gap-2 text-xs text-[#6B645A] mb-8">
             <Link to="/" className="hover:text-[#C9921A]">Home</Link><span>/</span>
-            <Link to="/products" className="hover:text-[#C9921A]">Catalogue</Link><span>/</span>
+            <Link to="/products" search={{} as any} className="hover:text-[#C9921A]">Catalogue</Link><span>/</span>
             <span className="text-[#1C3A2A] font-medium">{p.name}</span>
           </nav>
 
           <div className="grid lg:grid-cols-[1fr_1fr] gap-12 xl:gap-16">
-            {/* Gallery */}
-            <div>
-              <div className="aspect-square rounded-[24px] overflow-hidden mb-4 bg-[#FFF8EC] relative">
-                <ProductImage src={galleryImages[activeImg]} alt={p.name} size="lg" className="transition-opacity duration-500" />
-                {p.isHeritageVerified && (
-                  <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9921A] text-[#1C3A2A] text-xs font-bold">
-                    <Shield size={12} /> Heritage Verified
-                  </div>
-                )}
-              </div>
-              {galleryImages.length > 1 && (
-                <div className="grid grid-cols-4 gap-3">
-                  {galleryImages.slice(0, 4).map((img: string, i: number) => (
-                    <button key={i} onClick={() => setActiveImg(i)}
-                      className="aspect-square rounded-[12px] overflow-hidden border-2 transition-all"
-                      style={{ borderColor: activeImg === i ? "#C9921A" : "transparent" }}>
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
+            {/* Gallery — zoom/lightbox */}
+            <div className="relative">
+              {(p as any).isDemo && (
+                <div className="absolute top-4 left-4 z-10">
+                  <DemoBadge position="top-left" size="md" />
                 </div>
               )}
+              {p.isHeritageVerified && (
+                <div className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C9921A] text-[#1C3A2A] text-xs font-bold">
+                  <Shield size={12} /> Heritage Verified
+                </div>
+              )}
+              <ProductImageZoom images={galleryImages} alt={p.name} />
             </div>
 
             {/* Info */}
@@ -190,8 +221,14 @@ function ProductDetailPage() {
                   <span className="text-xs text-[#6B645A]">({reviews?.length || p.numReviews} reviews)</span>
                 </div>
               )}
-              <div className="flex items-baseline gap-3 mb-6">
-                <span className="font-display text-4xl font-semibold text-[#C9921A]">{formatPKR(p.price)}</span>
+              <div className="flex items-center gap-4 mb-6">
+                <div>
+                  <span className="font-display text-4xl font-semibold text-[#C9921A]">{formatPKR(p.price)}</span>
+                  {currency !== "PKR" && (
+                    <p className="text-xs text-[#6B645A] mt-0.5">{formatPrice(p.price, currency)}</p>
+                  )}
+                </div>
+                <MadeInStamp city={p.region} size="md" />
               </div>
 
               {/* Artisan card */}
@@ -223,7 +260,7 @@ function ProductDetailPage() {
                 </button>
               </div>
 
-              <div className="flex gap-3 mb-8">
+              <div className="flex gap-3 mb-4">
                 <button onClick={handleWishlist}
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full border border-[rgba(28,58,42,0.18)] bg-white text-sm font-semibold hover:bg-[#FFF8EC] transition-colors"
                   style={{ color: wishlisted ? "#C9921A" : "#1C3A2A" }}>
@@ -234,6 +271,24 @@ function ProductDetailPage() {
                   <Share2 size={16} /> Share
                 </button>
               </div>
+              {/* Compare button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (isInCompare(p._id)) {
+                    removeFromCompare(p._id);
+                    toast.info("Removed from comparison");
+                  } else {
+                    addToCompare({ _id: p._id, name: p.name, price: p.price, images: galleryImages, city: p.region, region: p.region, category: p.category, artisan: p.artisan as string | undefined });
+                    toast.success("Added to comparison");
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-full border border-[rgba(28,58,42,0.18)] bg-white text-sm font-semibold hover:bg-[#FFF8EC] transition-colors mb-4"
+                style={{ color: isInCompare(p._id) ? "#C9921A" : "#1C3A2A" }}
+              >
+                <SlidersHorizontal size={16} />
+                {isInCompare(p._id) ? "Remove from compare" : "Add to compare"}
+              </button>
 
               {/* Details accordion */}
               <div className="space-y-3">
@@ -268,7 +323,7 @@ function ProductDetailPage() {
                       {r.isVerifiedPurchase && <span className="ml-2 text-[9px] font-bold uppercase tracking-wider text-[#C9921A]">Verified</span>}
                     </div>
                     {r.title && <p className="font-semibold text-[#1C3A2A] mb-1 text-sm">{r.title}</p>}
-                    <p className="text-sm text-[#3D2914] leading-relaxed mb-3">{r.comment}</p>
+                    <p className="text-sm font-medium text-[#1C3A2A] leading-relaxed mb-3">{r.comment}</p>
                     <p className="text-xs text-[#6B645A]">{r.user?.name || "Anonymous"}</p>
                     {r.sellerReply?.text && (
                       <div className="mt-3 pt-3 border-t border-[rgba(28,58,42,0.08)]">
@@ -294,7 +349,7 @@ function ProductDetailPage() {
                   <MessageCircle size={14} className="text-[#C9921A] mt-0.5 flex-shrink-0" />
                   <p className="text-sm font-semibold text-[#1C3A2A]">{q.question}</p>
                 </div>
-                <p className="text-sm text-[#3D2914] pl-5 leading-relaxed">{q.answer}</p>
+                <p className="text-sm font-medium text-[#1C3A2A] pl-5 leading-relaxed">{q.answer}</p>
               </div>
             ))}
             <form onSubmit={handleAskQuestion} className="mt-4 flex gap-3">
@@ -306,9 +361,24 @@ function ProductDetailPage() {
               </button>
             </form>
           </section>
+          {/* Origin map */}
+          {p.region && (
+            <section className="mt-16">
+              <p className="eyebrow mb-3">Origin</p>
+              <MiniOriginMap city={p.region} region={p.region} />
+            </section>
+          )}
         </div>
       </div>
+      <RecentlyViewed />
       <Footer />
+      {p && (
+        <StickyBuyBar
+          product={{ _id: p._id, name: p.name, price: p.price, images: p.gallery }}
+          visible={showSticky}
+          onAdd={handleAddToCart}
+        />
+      )}
     </div>
   );
 }
@@ -321,7 +391,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
         <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#1C3A2A]">{label}</span>
         <ChevronDown size={16} className={`text-[#6B645A] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && <div className="px-4 pb-4 text-sm text-[#3D2914] leading-relaxed">{value}</div>}
+      {open && <div className="px-4 pb-4 text-sm font-medium text-[#1C3A2A] leading-relaxed">{value}</div>}
     </div>
   );
 }

@@ -134,6 +134,8 @@ app.use("/api/v1",                require("./routes/cityRoutes"));
 app.use("/api/v1",                require("./routes/collectionRoutes"));
 app.use("/api/v1",                require("./routes/recommendationsRoutes"));
 app.use("/api/v1",                require("./routes/adminMgmtRoutes"));
+app.use("/api/v1/assistant",      require("./routes/assistantRoutes"));
+app.use("/api/v1",                require("./routes/buyerStoryRoutes"));
 
 // ─── Deprecated /api/ Aliases (backward compat, 6 months) ───
 // Every alias is wrapped in deprecationMiddleware so old clients receive

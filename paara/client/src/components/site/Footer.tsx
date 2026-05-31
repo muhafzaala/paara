@@ -92,6 +92,9 @@ export function Footer() {
           <p className="text-xs tracking-[0.2em] uppercase text-[rgba(245,237,216,0.5)]">
             © {new Date().getFullYear()} PAARA · Crafted in Pakistan
           </p>
+          <p className="text-[10px] tracking-[0.15em] text-[rgba(245,237,216,0.18)] select-none hidden md:block">
+            ✦ try the magic word
+          </p>
           <p className="urdu text-[#C9921A]">ہماری میراث، آپ کا اعتماد</p>
         </div>
       </div>

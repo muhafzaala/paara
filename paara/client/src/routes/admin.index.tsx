@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import CountUpNumber from "@/components/ui/CountUpNumber";
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Users, Package, ShoppingBag, TrendingUp, Award, FileSearch, Loader2, Crown } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
@@ -95,7 +96,9 @@ function Stat({ label, value, icon: Icon, accent }: any) {
         <p className="text-[10px] uppercase tracking-[0.14em] text-[#6B645A] font-semibold">{label}</p>
         <Icon size={16} className={accent ? "text-[#C9921A]" : "text-[#1C3A2A]"} />
       </div>
-      <p className={`display-serif text-2xl font-semibold ${accent ? "text-[#C9921A]" : "text-[#1C3A2A]"}`}>{value ?? 0}</p>
+      <p className={`display-serif text-2xl font-semibold ${accent ? "text-[#C9921A]" : "text-[#1C3A2A]"}`}>
+        {typeof value === "number" ? <CountUpNumber value={value} /> : (value ?? 0)}
+      </p>
     </div>
   );
 }

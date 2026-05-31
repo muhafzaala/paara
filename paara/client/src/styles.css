@@ -258,6 +258,499 @@
     perspective: 1200px;
     filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55));
   }
+  /* ── Heritage Map ─────────────────────────────────────────── */
+  .hm-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .hm-image {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 8px 48px rgba(28,58,42,0.18);
+    display: block;
+    pointer-events: none;
+  }
+  .hm-marker {
+    position: absolute;
+    left: var(--hm-x);
+    top: var(--hm-y);
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  .hm-marker.is-active { z-index: 30; }
+  .hm-ping {
+    position: absolute;
+    inset: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #C9921A;
+    opacity: 0.45;
+    animation: ping 1.4s cubic-bezier(0,0,0.2,1) infinite;
+  }
+  .hm-marker.is-active .hm-ping { opacity: 0; animation: none; }
+  @keyframes ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
+  }
+  .hm-dot {
+    position: relative;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #C9921A;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    transition: transform 0.18s, background 0.18s, box-shadow 0.18s;
+  }
+  .hm-marker.is-active .hm-dot {
+    background: #1C3A2A;
+    box-shadow: 0 0 0 3px rgba(28,58,42,0.4);
+    transform: scale(1.4);
+  }
+  .hm-tooltip {
+    position: absolute;
+    width: 172px;
+    background: white;
+    border-radius: 16px;
+    border: 1.5px solid rgba(201,146,26,0.25);
+    box-shadow: 0 8px 32px rgba(28,58,42,0.18);
+    overflow: hidden;
+    top: 0;
+    left: 18px;
+    /* Hidden by default; shown when parent .hm-marker is hovered.
+       CSS :hover tracks the full subtree so the card stays open
+       even when the mouse moves from the dot onto the card itself. */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s, visibility 0.18s;
+  }
+  .hm-marker:hover .hm-tooltip {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .hm-tooltip.flip-x { left: auto; right: 18px; }
+  .hm-tooltip.flip-y { top: auto; bottom: 18px; }
+  .hm-tooltip-head {
+    padding: 8px 12px;
+    background: #1C3A2A;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hm-tooltip-city {
+    font-size: 11px;
+    font-weight: 700;
+    color: #F5EDD8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hm-tooltip-body { padding: 8px 12px 10px; }
+  .hm-tooltip-craft {
+    font-size: 11px;
+    color: #6B645A;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .hm-tooltip-link {
+    font-size: 11px;
+    font-weight: 700;
+    color: #C9921A;
+    text-decoration: none;
+  }
+  .hm-tooltip-link:hover { text-decoration: underline; }
+  .hm-legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    border-radius: 12px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(28,58,42,0.82);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  /* SVG map province fills */
+  .hm-bg        { fill: #1C3A2A; }
+  .hm-svg       { width: 100%; height: auto; display: block; border-radius: 20px; }
+  .hm-province  { fill: var(--province-fill,#888); stroke: #1C3A2A; stroke-width: 1.5; transition: opacity 0.2s; }
+  .hm-province:hover { opacity: 0.82; }
+  .hm-province-label       { fill: rgba(255,255,255,0.82); font-size: 11px; font-weight: 600; text-anchor: middle; pointer-events: none; }
+  .hm-province-label.small { font-size: 9px; }
+  .hm-city-group  { cursor: pointer; }
+  .hm-city-pulse  { fill: #C9921A; opacity: 0.35; animation: ping 1.4s cubic-bezier(0,0,0.2,1) infinite; }
+  .hm-city-dot    { fill: #C9921A; stroke: white; stroke-width: 1.5; transition: r 0.15s; }
+  .hm-city-dot.active { fill: #1C3A2A; stroke: #C9921A; stroke-width: 2; }
+  .hm-legend-swatch { fill: var(--province-fill,#888); }
+  .hm-legend-text   { fill: rgba(255,255,255,0.75); font-size: 9px; dominant-baseline: middle; }
+  /* Province fill colours — avoids any inline style on SVG elements */
+  .hm-p-balochistan { --province-fill: #E07B39; }
+  .hm-p-sindh       { --province-fill: #7C4DCC; }
+  .hm-p-punjab      { --province-fill: #8BC34A; }
+  .hm-p-kpk         { --province-fill: #F4511E; }
+  .hm-p-gb          { --province-fill: #673AB7; }
+  .hm-p-ajk         { --province-fill: #E91E8C; }
+
+  .hm-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #C9921A;
+    flex-shrink: 0;
+  }
+  .hm-legend-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #F5EDD8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Notification Bell — type badges */
+  .nb-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+  .nb-badge-green  { background: #D1FAE5; color: #065F46; }
+  .nb-badge-blue   { background: #DBEAFE; color: #1E40AF; }
+  .nb-badge-yellow { background: #FEF9C3; color: #854D0E; }
+  .nb-badge-purple { background: #EDE9FE; color: #5B21B6; }
+  .nb-badge-red    { background: #FEE2E2; color: #991B1B; }
+  .nb-badge-gray   { background: #F3F4F6; color: #374151; }
+
+  /* ── Ken Burns hero ───────────────────────────────── */
+  @keyframes ken-burns {
+    from { transform: scale(1.0) translate(0%,    0%);    }
+    to   { transform: scale(1.14) translate(-2.5%, -1.5%); }
+  }
+  .kb-slide {
+    animation: ken-burns 9s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* ── Surprise Me ─────────────────────────────────────── */
+  .sm-trigger {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    z-index: 49;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #C9921A 0%, #e8b144 50%, #C9921A 100%);
+    background-size: 200% 200%;
+    color: #1C3A2A;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(201,146,26,0.45), 0 1px 4px rgba(0,0,0,0.12);
+    animation: sm-shimmer 3s ease infinite, sm-float 4s ease-in-out infinite;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .sm-trigger:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 32px rgba(201,146,26,0.55);
+  }
+  .sm-trigger-label { white-space: nowrap; }
+
+  @keyframes sm-shimmer {
+    0%,100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  @keyframes sm-float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
+
+  .sm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(15,34,25,0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: sm-overlay-in 0.25s ease;
+  }
+  @keyframes sm-overlay-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .sm-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: #FFFDF7;
+    border-radius: 28px;
+    padding: 36px 32px 32px;
+    text-align: center;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.35), 0 0 0 1.5px rgba(201,146,26,0.2);
+    animation: sm-card-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    overflow: hidden;
+  }
+  .sm-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,146,26,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  @keyframes sm-card-in {
+    from { opacity: 0; transform: translateY(40px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .sm-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(28,58,42,0.08);
+    color: #1C3A2A;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .sm-close:hover { background: rgba(28,58,42,0.15); }
+
+  .sm-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #C9921A;
+    margin-bottom: 20px;
+  }
+
+  .sm-emoji-wrap {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #FFF8EC, #FFF0D0);
+    border-radius: 50%;
+    border: 2.5px solid rgba(201,146,26,0.25);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 24px rgba(201,146,26,0.18);
+  }
+  .sm-emoji { font-size: 42px; line-height: 1; display: block; }
+
+  .sm-pop  { animation: sm-pop  0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .sm-spinning { animation: sm-spin-out 0.38s ease; opacity: 0.3; transform: scale(0.8); }
+  @keyframes sm-pop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    70%  { transform: scale(1.15); }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+  @keyframes sm-spin-out {
+    from { transform: scale(1)   rotate(0deg);   opacity: 1; }
+    to   { transform: scale(0.7) rotate(180deg); opacity: 0.2; }
+  }
+
+  .sm-vibe {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C9921A;
+    background: rgba(201,146,26,0.1);
+    border: 1px solid rgba(201,146,26,0.25);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+  }
+  .sm-craft-name {
+    font-family: var(--font-display, Georgia, serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: #1C3A2A;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .sm-city {
+    font-size: 12px;
+    color: #6B645A;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .sm-fact {
+    font-size: 13.5px;
+    color: #3D3530;
+    line-height: 1.65;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+  .sm-price {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1C3A2A;
+    background: rgba(28,58,42,0.06);
+    border-radius: 999px;
+    padding: 6px 14px;
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+  .sm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .sm-btn-primary {
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: #1C3A2A;
+    color: #F5EDD8;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    border: none;
+    cursor: pointer;
+  }
+  .sm-btn-primary:hover { background: #0F2219; transform: translateY(-1px); }
+  .sm-btn-secondary {
+    padding: 11px 18px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1.5px solid rgba(28,58,42,0.2);
+    color: #1C3A2A;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .sm-btn-secondary:hover { background: #FFF8EC; transform: translateY(-1px); }
+
+  /* ── Sticky Buy Bar ──────────────────────────────── */
+  .sbb-root {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 55;
+    background: rgba(255,255,255,0.92);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 -8px 40px rgba(28,58,42,0.14), 0 -1px 0 rgba(201,146,26,0.0);
+  }
+  .sbb-accent {
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #C9921A 30%, #E5A82E 50%, #C9921A 70%, transparent 100%);
+  }
+  .sbb-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 20px;
+  }
+  .sbb-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFF8EC;
+    flex-shrink: 0;
+    position: relative;
+    border: 1.5px solid rgba(201,146,26,0.2);
+  }
+  .sbb-info { flex: 1; min-width: 0; }
+  .sbb-name {
+    font-family: var(--font-display, Georgia, serif);
+    font-size: 14px;
+    font-weight: 600;
+    color: #1C3A2A;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sbb-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #C9921A;
+    margin-top: 1px;
+  }
+  .sbb-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: #1C3A2A;
+    color: #F5EDD8;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(28,58,42,0.25);
+  }
+  .sbb-btn:hover { background: #0F2219; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(28,58,42,0.3); }
+  .sbb-btn--flash { background: #2A6F3A !important; }
+
+  /* ── Calligraphy Divider ──────────────────────────── */
+  .cd-label {
+    font-size: clamp(22px, 3vw, 32px);
+    color: #C9921A;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 8px rgba(201,146,26,0.25);
+  }
+  .cd-flourish-mirror { transform: scaleX(-1); }
+
+  /* ── Theme layer (low-specificity, body-level only) ── */
+  html[data-theme="dark"] body {
+    background-color: #0F2219;
+    color: #F5EDD8;
+  }
+  html[data-theme="dark"] .bg-\[\#F5EDD8\] {
+    background-color: #0F2219;
+  }
+  html[data-theme="heritage"] body {
+    box-shadow: inset 0 0 300px rgba(201,146,26,0.06);
+  }
+  html[data-theme="heritage"] .btn-primary {
+    box-shadow: 0 0 16px rgba(201,146,26,0.35);
+  }
+
+  .pakistan-flag-canvas {
+    display: block;
+    width: min(72%, 520px);
+    aspect-ratio: 3 / 2;
+    filter: drop-shadow(0 28px 56px rgba(0,0,0,0.6));
+  }
   .paara-flag-inner {
     width: 100%;
     height: 100%;

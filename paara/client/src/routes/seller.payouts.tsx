@@ -20,7 +20,7 @@ function SellerPayoutsPage() {
   const handleRequest = async () => {
     if (!amount || isNaN(Number(amount))) return;
     setRequesting(true);
-    try { await sellerApi.requestPayout(Number(amount)); toast.success("Payout request submitted. 3–5 business days."); setAmount(""); }
+    try { await sellerApi.requestPayout({ amount: Number(amount) }); toast.success("Payout request submitted. 3–5 business days."); setAmount(""); }
     catch { toast.error("Could not submit payout request"); } finally { setRequesting(false); }
   };
 

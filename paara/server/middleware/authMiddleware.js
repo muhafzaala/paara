@@ -7,7 +7,7 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.id ?? decoded.sub).select("-password");
       if (!req.user) return res.status(401).json({ success: false, message: "User not found" });
       next();
     } catch {
@@ -41,10 +41,34 @@ const optionalAuth = async (req, res, next) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.id ?? decoded.sub).select("-password");
     } catch { req.user = null; }
   }
   next();
 };
 
-module.exports = { protect, adminOnly, sellerOnly, sellerOrAdmin, optionalAuth };
+const primaryAdminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin" || !req.user.isPrimaryAdmin) {
+    return res.status(403).json({ success: false, message: "Primary admin only" });
+  }
+  next();
+};
+
+const activeAdminOnly = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Admin only" });
+  }
+  if (req.user.adminStatus !== "active") {
+    return res.status(403).json({ success: false, message: `Admin account ${req.user.adminStatus}` });
+  }
+  next();
+};
+
+const require2FA = (req, res, next) => {
+  if (req.user?.role === "admin" && !req.session2FAVerified) {
+    return res.status(403).json({ success: false, message: "2FA verification required", twoFactor: true });
+  }
+  next();
+};
+
+module.exports = { protect, adminOnly, sellerOnly, sellerOrAdmin, optionalAuth, primaryAdminOnly, activeAdminOnly, require2FA };

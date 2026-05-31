@@ -236,4 +236,13 @@ export const leaderboardApi = {
   getRegions: () => api.get("/admin/leaderboard/regions"),
 };
 
+export const storiesApi = {
+  listApproved: () => api.get("/buyer-stories"),
+  listMine: () => api.get("/buyer-stories/mine"),
+  submit: (data: object) => api.post("/buyer-stories", data),
+  listForModeration: (status: string = "pending") => api.get("/admin/buyer-stories", { params: { status } }),
+  review: (id: string, action: "approve" | "reject", reason?: string) =>
+    api.patch(`/admin/buyer-stories/${id}/review`, { action, reason }),
+};
+
 export default api;

@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const SellerProfile = require("../models/SellerProfile");
+const { notifyAllAdmins } = require("../utils/notify");
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || "7d" });
@@ -42,6 +43,13 @@ exports.register = async (req, res) => {
     if (user.role === "seller") {
       await SellerProfile.create({ user: user._id });
     }
+
+    notifyAllAdmins({
+      type: "new_user_registered",
+      title: "New user registered",
+      message: `${user.name} (${user.role}) created an account.`,
+      link: "/admin/users",
+    });
 
     // In production replace `otp` with an email send; never expose it in the response
     res.status(201).json({
@@ -108,7 +116,7 @@ exports.resendEmailOtp = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password +twoFactorSecret");
     if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ success: false, message: "Invalid email or password" });
     if (!user.isActive) return res.status(403).json({ success: false, message: "Account deactivated" });
@@ -117,13 +125,33 @@ exports.login = async (req, res) => {
     if (user.role === "admin") {
       if (user.adminStatus !== "active")
         return res.status(403).json({ success: false, message: `Admin ${user.adminStatus}` });
-      const { createOTP } = require("../utils/otp");
-      await createOTP(user._id, "admin_2fa", "console", req.ip);
+
+      if (user.twoFactorEnabled && user.twoFactorSecret) {
+        // Admin has TOTP set up — challenge via authenticator app
+        const challengeToken = jwt.sign(
+          { sub: user._id, stage: "admin_totp" },
+          process.env.JWT_SECRET, { expiresIn: "10m" }
+        );
+        return res.json({ success: true, twoFactor: true, stage: "totp", challengeToken, message: "Enter your authenticator code" });
+      } else {
+        // Admin has no TOTP yet — fall back to console OTP, flag setup required
+        const { createOTP } = require("../utils/otp");
+        await createOTP(user._id, "admin_2fa", "console", req.ip);
+        const challengeToken = jwt.sign(
+          { sub: user._id, stage: "admin_otp" },
+          process.env.JWT_SECRET, { expiresIn: "10m" }
+        );
+        return res.json({ success: true, twoFactor: true, stage: "otp", mustSetupTOTP: true, challengeToken, message: "OTP sent to console" });
+      }
+    }
+
+    // Seller / buyer: TOTP challenge if they have it enabled
+    if (user.twoFactorEnabled && user.twoFactorSecret) {
       const challengeToken = jwt.sign(
-        { sub: user._id, stage: "admin_2fa" },
+        { sub: user._id, stage: "user_totp", role: user.role },
         process.env.JWT_SECRET, { expiresIn: "10m" }
       );
-      return res.json({ success: true, twoFactor: true, challengeToken, message: "OTP sent" });
+      return res.json({ success: true, twoFactor: true, stage: "totp", challengeToken, message: "Enter your authenticator code" });
     }
 
     const token = jwt.sign(
@@ -133,17 +161,19 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar, twoFactorEnabled: user.twoFactorEnabled || false, city: user.city, addresses: user.addresses },
     });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 };
 
-// POST /api/v1/auth/verify-2fa
+// POST /api/v1/auth/verify-2fa  (console OTP path for admins without TOTP)
 exports.verify2FA = async (req, res) => {
   try {
     const { challengeToken, code } = req.body;
     const decoded = jwt.verify(challengeToken, process.env.JWT_SECRET);
-    if (decoded.stage !== "admin_2fa") return res.status(400).json({ success: false, message: "Invalid challenge" });
+    // Accept both old "admin_2fa" and new "admin_otp" stage names
+    if (!["admin_2fa", "admin_otp"].includes(decoded.stage))
+      return res.status(400).json({ success: false, message: "Invalid challenge" });
     const { verifyOTP } = require("../utils/otp");
     await verifyOTP(decoded.sub, "admin_2fa", code);
     const user = await User.findById(decoded.sub);
@@ -155,7 +185,61 @@ exports.verify2FA = async (req, res) => {
     );
     res.json({
       success: true, token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role, isPrimaryAdmin: user.isPrimaryAdmin },
+      mustSetupTOTP: !user.twoFactorEnabled,
+      user: {
+        _id: user._id, name: user.name, email: user.email, role: user.role,
+        isPrimaryAdmin: user.isPrimaryAdmin,
+        twoFactorEnabled: user.twoFactorEnabled || false,
+        twoFactorRequired: user.twoFactorRequired || false,
+      },
+    });
+  } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
+};
+
+// POST /api/v1/auth/verify-totp  (authenticator app TOTP — admin, seller, buyer)
+exports.verifyAdminTOTP = async (req, res) => {
+  try {
+    const { challengeToken, code } = req.body;
+    const decoded = jwt.verify(challengeToken, process.env.JWT_SECRET);
+    const validStages = ["admin_totp", "user_totp"];
+    if (!validStages.includes(decoded.stage))
+      return res.status(400).json({ success: false, message: "Invalid challenge" });
+
+    const speakeasy = require("speakeasy");
+    const user = await User.findById(decoded.sub).select("+twoFactorSecret");
+    if (!user || !user.isActive)
+      return res.status(403).json({ success: false, message: "Not allowed" });
+
+    // Admin-specific extra check
+    if (user.role === "admin" && user.adminStatus !== "active")
+      return res.status(403).json({ success: false, message: `Admin account ${user.adminStatus}` });
+
+    if (!user.twoFactorEnabled || !user.twoFactorSecret)
+      return res.status(400).json({ success: false, message: "TOTP not configured for this account" });
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: "base32",
+      token: code,
+      window: 1,
+    });
+    if (!verified) return res.status(400).json({ success: false, message: "Invalid authenticator code" });
+
+    const token = jwt.sign(
+      { sub: user._id, role: user.role, twoFA: true },
+      process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
+    res.json({
+      success: true, token,
+      user: {
+        _id: user._id, name: user.name, email: user.email, role: user.role,
+        avatar: user.avatar,
+        isPrimaryAdmin: user.isPrimaryAdmin,
+        twoFactorEnabled: true,
+        twoFactorRequired: user.twoFactorRequired || false,
+        city: user.city,
+        addresses: user.addresses,
+      },
     });
   } catch (err) { res.status(err.status || 400).json({ success: false, message: err.message }); }
 };

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Receipt, BarChart3, Wallet, Settings, Store, Bell, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Package, Receipt, BarChart3, Wallet, Settings, Store, BookOpen, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/seller" as const, label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/seller/products" as const, label: "Products", icon: Package },
   { to: "/seller/orders" as const, label: "Orders", icon: Receipt },
+  { to: "/seller/heritage" as const, label: "Heritage Stories", icon: BookOpen },
   { to: "/seller/analytics" as const, label: "Analytics", icon: BarChart3 },
   { to: "/seller/payouts" as const, label: "Payouts", icon: Wallet },
   { to: "/seller/settings" as const, label: "Settings", icon: Settings },
