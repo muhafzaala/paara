@@ -10,9 +10,7 @@
 
 </div>
 
-### Pakistan's Verified Heritage Crafts Marketplace
 
-*Where regional artisans meet the world — authentic, story-rich, and verified.*
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](LICENSE)
