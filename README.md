@@ -143,24 +143,24 @@ Test accounts (seeded automatically):
 
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/01-homepage.png" alt="Homepage" /><br /><sub><b>Heritage Homepage</b></sub></td>
-    <td align="center"><img src="docs/screenshots/02-products.png" alt="Product browse" /><br /><sub><b>Faceted Discovery</b></sub></td>
+    <td align="center"><img src="docs/screenshots/homepage.png" alt="Homepage" /><br /><sub><b>Heritage Homepage</b></sub></td>
+    <td align="center"><img src="docs/screenshots/product-browse.png" alt="Product browse" /><br /><sub><b>Faceted Discovery</b></sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/03-product-detail.png" alt="Product detail" /><br /><sub><b>Story-Rich Product Page</b></sub></td>
-    <td align="center"><img src="docs/screenshots/04-checkout.png" alt="Checkout" /><br /><sub><b>Receipt-Style Checkout</b></sub></td>
+    <td align="center"><img src="docs/screenshots/product-detail.png" alt="Product detail" /><br /><sub><b>Story-Rich Product Page</b></sub></td>
+    <td align="center"><img src="docs/screenshots/checkout.png" alt="Checkout" /><br /><sub><b>Receipt-Style Checkout</b></sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/05-celebration.png" alt="Regional celebration" /><br /><sub><b>Regional Dance Celebration</b></sub></td>
-    <td align="center"><img src="docs/screenshots/06-passport.png" alt="Heritage Passport" /><br /><sub><b>Heritage Passport</b></sub></td>
+    <td align="center"><img src="docs/screenshots/regional-celebration.jpg" alt="Regional celebration" /><br /><sub><b>Regional Dance Celebration</b></sub></td>
+    <td align="center"><img src="docs/screenshots/heritage-passport.png" alt="Heritage Passport" /><br /><sub><b>Heritage Passport</b></sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/07-seller-dashboard.png" alt="Seller dashboard" /><br /><sub><b>Seller Analytics</b></sub></td>
-    <td align="center"><img src="docs/screenshots/08-admin.png" alt="Admin dashboard" /><br /><sub><b>Admin Command Center</b></sub></td>
+    <td align="center"><img src="docs/screenshots/seller-dashboard.jpg" alt="Seller dashboard" /><br /><sub><b>Seller Analytics</b></sub></td>
+    <td align="center"><img src="docs/screenshots/admin-dashboard.jpg" alt="Admin dashboard" /><br /><sub><b>Admin Command Center</b></sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/09-onboarding.png" alt="Seller onboarding" /><br /><sub><b>4-Stage Verification</b></sub></td>
-    <td align="center"><img src="docs/screenshots/10-map.png" alt="Heritage map" /><br /><sub><b>Interactive Heritage Map</b></sub></td>
+    <td align="center"><img src="docs/screenshots/seller-onboarding.jpg" alt="Seller onboarding" /><br /><sub><b>4-Stage Verification</b></sub></td>
+    <td align="center"><img src="docs/screenshots/heritage-map.jpg" alt="Heritage map" /><br /><sub><b>Interactive Heritage Map</b></sub></td>
   </tr>
 </table>
 
@@ -600,3 +600,4 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 *If this project resonates with you, please ⭐ the repo — it helps more than you'd think.*
 
 </div>
+
