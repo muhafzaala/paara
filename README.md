@@ -1,13 +1,14 @@
 <div align="center">
-<img src="docs/assets/logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="160" />
+
+<img src="docs/assets/logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="220" />
+
 # پارہ · PAARA
+
 ### Pakistan's Verified Heritage Crafts Marketplace
-*Where regional artisans meet the world — authentic, story-rich, and verified.* 
 
+*Where regional artisans meet the world — authentic, story-rich, and verified.*
 
-
-# پارہ 
-· PAARA
+</div>
 
 ### Pakistan's Verified Heritage Crafts Marketplace
 
