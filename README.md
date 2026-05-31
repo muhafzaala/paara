@@ -1,6 +1,10 @@
 <div align="center">
 
-<img src="docs/assets/logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="160" />
+<img src="docs/assets/banner.png" alt="PAARA Banner" width="100%" />
+
+<br /><br />
+
+<img src="docs/assets/paara-logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="160" />
 
 # پارہ · PAARA
 
