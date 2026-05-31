@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="docs/assets/paara-logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="160" />
+<img src="docs/assets/logo.png" alt="PAARA — Pakistan's Heritage Marketplace" width="160" />
 
 # پارہ · PAARA
 
@@ -602,5 +602,6 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 *If this project resonates with you, please ⭐ the repo — it helps more than you'd think.*
 
 </div>
+
 
 
