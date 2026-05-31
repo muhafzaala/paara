@@ -6,7 +6,8 @@
 
 
 
-# پارہ · PAARA
+# پارہ 
+· PAARA
 
 ### Pakistan's Verified Heritage Crafts Marketplace
 
